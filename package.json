@@ -1,0 +1,30 @@
+{
+  "name": "popover-helper",
+  "version": "1.0.0",
+  "description": "popover-helper",
+  "main": "src/index.js",
+  "browser": {
+    "popover-helper": "dist/popover-helper.js"
+  },
+  "scripts": {
+    "build": "npx webpack"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cenfun/popover-helper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cenfun/popover-helper/issues"
+  },
+  "homepage": "https://github.com/cenfun/popover-helper#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
