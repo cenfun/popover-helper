@@ -1,11 +1,14 @@
 # popover-helper
 
-### Install
+## Install
 ```sh
 npm i popover-helper
 ```
 
-### API Usage
+## Preview
+[https://cenfun.github.io/popover-helper](https://cenfun.github.io/popover-helper)
+
+## API Usage
 ```js
 import { getRect, getBestPosition } from "popover-helper";
 
@@ -47,4 +50,4 @@ const update = () => {
 update();
 
 ```
-see [/public/index.html](/public/index.html)
+see source code [/public/index.html](/public/index.html)
