@@ -9,29 +9,42 @@ npm i popover-helper
 ```js
 import { getRect, getBestPosition } from "popover-helper";
 
-//get 3 rect for calculation
-const containerRect = getRect(this.container || window);
-const targetRect = getRect(this.target);
-//update popover content size here
-const popoverRect = getRect("popover_selector");
+const $popover = document.querySelector('.popover');
+let positionInfo;
 
-this.positionInfo = getBestPosition(
-    containerRect,
-    targetRect,
-    popoverRect,
-    //accept positions
-    this.positions,
-    //previous position info
-    this.positionInfo
-);
+const update = () => {
+    //get 3 rect for calculation
+    const containerRect = getRect('.container');
+    const targetRect = getRect('.target');
+    const popoverRect = getRect('.popover');
+    const positions = [];
 
-// positionInfo: {
-//     position: String,
-//     align: String,
-//     top: Number,
-//     left: Number,
-//     width: Number,
-//     height: Number
-// }
+    positionInfo = getBestPosition(
+        containerRect,
+        targetRect,
+        popoverRect,
+        //acceptable positions
+        positions,
+        //previous position info
+        positionInfo
+    );
+
+    //console.log(positionInfo);
+    // positionInfo: {
+    //     position: String,
+    //     align: String,
+    //     top: Number,
+    //     left: Number,
+    //     width: Number,
+    //     height: Number
+    // }
+
+    $popover.style.left = `${positionInfo.left}px`;
+    $popover.style.top = `${positionInfo.top}px`;
+
+};
+
+update();
+
 ```
-
+see [/public/index.html](/public/index.html)

@@ -1,5 +1,5 @@
 const toNum = (num) => {
-    if (typeof(num) !== "number") {
+    if (typeof (num) !== 'number') {
         num = parseFloat(num);
     }
     if (isNaN(num)) {
@@ -10,11 +10,15 @@ const toNum = (num) => {
 };
 
 const isWindow = (obj) => {
-    return obj !== null && obj !== undefined && obj === obj.window;
+    return Boolean(obj && obj === obj.window);
 };
 
 const isDocument = (obj) => {
-    return obj !== null && obj.nodeType === 9;
+    return Boolean(obj && obj.nodeType === 9);
+};
+
+const isElement = (obj) => {
+    return Boolean(obj && obj.nodeType === 1);
 };
 
 export const toRect = (obj) => {
@@ -35,22 +39,19 @@ export const toRect = (obj) => {
 };
 
 export const getElement = (selector) => {
-    if (isDocument(selector)) {
-        return selector.body;
-    }
-    if (typeof selector !== "string") {
+    if (typeof selector !== 'string') {
+        if (isDocument(selector)) {
+            return selector.body;
+        }
+        if (isElement(selector)) {
+            return selector;
+        }
         return;
     }
-    if (selector.substr(0, 1) === "#") {
-        try {
-            return document.getElementById(selector.substr(1));
-        } catch (e) {
-        }
+    if (selector.startsWith('#')) {
+        return document.getElementById(selector.substr(1));
     }
-    try {
-        return document.querySelector(selector);
-    } catch (e) {
-    }
+    return document.querySelector(selector);
 };
 
 export const getRect = (target) => {
@@ -80,9 +81,9 @@ export const getRect = (target) => {
     rect.top += window.pageYOffset;
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
-    
+
     //console.log(elem.tagName, rect);
-    
+
     return rect;
 };
 
@@ -90,28 +91,28 @@ export const getRect = (target) => {
 
 export const defaultPositions = {
 
-    "bottom-center": {
-        direction: "h",
+    'bottom-center': {
+        direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width * 0.5);
         }
     },
 
-    "bottom-right": {
-        direction: "h",
+    'bottom-right': {
+        direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5);
         }
     },
 
-    "bottom-left": {
-        direction: "h",
+    'bottom-left': {
+        direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width);
         }
@@ -119,28 +120,57 @@ export const defaultPositions = {
 
     //===========================================================================================
 
-    "right-center": {
-        direction: "v",
+    'top-center': {
+        direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.top = targetRect.top - rect.height;
+            info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width * 0.5);
+        }
+    },
+
+    'top-right': {
+        direction: 'h',
+        calculate: (info, containerRect, targetRect, rect) => {
+            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.top = targetRect.top - rect.height;
+            info.left = Math.round(targetRect.left + targetRect.width * 0.5);
+        }
+    },
+
+    'top-left': {
+        direction: 'h',
+        calculate: (info, containerRect, targetRect, rect) => {
+            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.top = targetRect.top - rect.height;
+            info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width);
+        }
+    },
+
+    //===========================================================================================
+
+    'right-center': {
+        direction: 'v',
+        calculate: (info, containerRect, targetRect, rect) => {
+            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height * 0.5);
             info.left = targetRect.left + targetRect.width;
         }
     },
 
-    "right-bottom": {
-        direction: "v",
+    'right-bottom': {
+        direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5);
             info.left = targetRect.left + targetRect.width;
         }
     },
 
-    "right-top": {
-        direction: "v",
+    'right-top': {
+        direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height);
             info.left = targetRect.left + targetRect.width;
         }
@@ -148,65 +178,62 @@ export const defaultPositions = {
 
     //===========================================================================================
 
-    "top-center": {
-        direction: "h",
+    'left-center': {
+        direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height;
-            info.top = targetRect.top - rect.height;
-            info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width * 0.5);
-        }
-    },
-
-    "top-right": {
-        direction: "h",
-        calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height;
-            info.top = targetRect.top - rect.height;
-            info.left = Math.round(targetRect.left + targetRect.width * 0.5);
-        }
-    },
-
-    "top-left": {
-        direction: "h",
-        calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height;
-            info.top = targetRect.top - rect.height;
-            info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width);
-        }
-    },
-
-    //===========================================================================================
-
-    "left-center": {
-        direction: "v",
-        calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width;
+            info.spacePosition = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height * 0.5);
             info.left = targetRect.left - rect.width;
         }
     },
 
-    "left-bottom": {
-        direction: "v",
+    'left-bottom': {
+        direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width;
+            info.spacePosition = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5);
             info.left = targetRect.left - rect.width;
         }
     },
-    
-    "left-top": {
-        direction: "v",
+
+    'left-top': {
+        direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width;
+            info.spacePosition = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height);
             info.left = targetRect.left - rect.width;
         }
     }
 };
 
-export const getDefaultPositions = () => {
-    return Object.keys(defaultPositions);
+export const getDefaultPositions = (sortKeys) => {
+    const list = Object.keys(defaultPositions);
+
+    if (sortKeys) {
+        list.sort((a, b) => {
+            // part left
+            const al = a.split('-');
+            const bl = b.split('-');
+            let av = al.shift();
+            let bv = bl.shift();
+            let ai = sortKeys.indexOf(av);
+            let bi = sortKeys.indexOf(bv);
+            ai = ai === -1 ? 4 : ai;
+            bi = bi === -1 ? 4 : bi;
+            if (ai === bi) {
+                //right part
+                av = al.shift();
+                bv = bl.shift();
+                ai = sortKeys.indexOf(av);
+                bi = sortKeys.indexOf(bv);
+                ai = ai === -1 ? 4 : ai;
+                bi = bi === -1 ? 4 : bi;
+            }
+            return ai - bi;
+        });
+    }
+
+    return list;
 };
 
 //===========================================================================================
@@ -218,7 +245,7 @@ const getSpaceAlign = (containerStart, containerSize, start, size) => {
 };
 
 const calculateSpace = (info, containerRect) => {
-    if (info.direction === "h") {
+    if (info.direction === 'h') {
         info.spaceAlign += getSpaceAlign(containerRect.left, containerRect.width, info.left, info.width);
     } else {
         info.spaceAlign += getSpaceAlign(containerRect.top, containerRect.height, info.top, info.height);
@@ -241,7 +268,7 @@ const calculateChange = (info, previousInfo) => {
     if (!previousInfo) {
         return info;
     }
-    //no change if type no change with previous 
+    //no change if type no change with previous
     if (info.type === previousInfo.type) {
         return info;
     }
@@ -256,7 +283,7 @@ const calculateChange = (info, previousInfo) => {
 };
 
 const calculatePositionInfo = (defaultInfo, index, type, containerRect, targetRect, rect, previousInfo) => {
-    const [position, align] = type.split("-");
+    const [position, align] = type.split('-');
     let info = {
         ... defaultInfo,
         type,
@@ -289,7 +316,7 @@ const getTypeList = (positions, defaultList) => {
         positions = [positions];
     }
     const map = {};
-    positions.forEach(item => {
+    positions.forEach((item) => {
         item = (`${item}`).trim().toLowerCase();
         if (defaultPositions[item]) {
             map[item] = true;
@@ -298,7 +325,7 @@ const getTypeList = (positions, defaultList) => {
         if (!item) {
             return;
         }
-        defaultList.forEach(pd => {
+        defaultList.forEach((pd) => {
             if (pd.indexOf(item) !== -1) {
                 map[pd] = true;
             }
@@ -312,11 +339,10 @@ const getTypeList = (positions, defaultList) => {
 };
 
 export const getBestPosition = (containerRect, targetRect, rect, positions, previousInfo) => {
+
     const defaultList = getDefaultPositions();
-    let withDefaultPositions = false;
     let typeList = getTypeList(positions, defaultList);
     if (!typeList) {
-        withDefaultPositions = true;
         typeList = defaultList;
     }
 
@@ -331,7 +357,7 @@ export const getBestPosition = (containerRect, targetRect, rect, positions, prev
         if (previousInfo && a.priority === 2) {
             return a.change - b.change;
         }
-        if (withDefaultPositions && a.space !== b.space) {
+        if (a.space !== b.space) {
             return b.space - a.space;
         }
         return a.index - b.index;

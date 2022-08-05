@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <link rel="icon" href="data:,">
+    <title>popover-helper</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }        
+
+        .container {
+            position: relative;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            width: 800px;
+            height: 600px;  
+            margin: 50px;
+        }
+
+        .container::before {
+            content: "container";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .target {
+            position: absolute;
+            background-color: red;
+            box-sizing: border-box;
+            width: 120px;
+            height: 30px;
+            cursor: move;
+            font-size: 12px;
+            text-align: center;
+            line-height: 30px;
+            user-select: none;
+        }
+
+        .popover {
+            position: absolute;
+            background-color: green;
+            box-sizing: border-box;
+            width: 300px;
+            height: 200px;
+            pointer-events: none;
+        }
+
+        .popover::before {
+            content: "popover";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .toolbar {
+            margin: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="target">target (drag me)</div>
+    </div>
+    <div class="popover"></div>
+
+    <div class="toolbar">
+        <div>
+            acceptable positions:
+            <span class="positions"></span>
+        </div>
+        <div>
+            popover width:
+            <input type="text" value="300px" class="pw" />
+            height:
+            <input type="text" value="200px" class="ph" />
+        </div>
+    </div>
+
+   <!--inject:start-->
+   <script src="../dist/popover-helper.js"></script>
+   <!--inject:end-->
+
+   <script>
+    const {
+        getRect, getDefaultPositions, getBestPosition
+    } = window['popover-helper'];
+
+    //===========================================================================================
+    //all positions
+    const $positions = document.querySelector('.positions');
+    const defaultPositions = getDefaultPositions();
+    const allPositions = Array.from(new Set(defaultPositions.join('-').split('-'))).concat(defaultPositions);
+    allPositions.forEach((item, i) => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.className = 'position';
+        input.setAttribute('type', 'checkbox');
+        input.setAttribute('value', item);
+        label.appendChild(input);
+        const span = document.createElement('span');
+        span.innerText = item;
+        label.appendChild(span);
+        $positions.appendChild(label);
+    });
+
+    let positions = [];
+    const updatePositions = () => {
+        positions = [];
+        Array.from(document.querySelectorAll('.position')).forEach((elem) => {
+            if (elem.checked) {
+                positions.push(elem.value);
+            }
+        });
+        console.log(positions);
+    };
+    updatePositions();
+
+    $positions.addEventListener('click', () => {
+        updatePositions();
+        update();
+    });
+
+    //===========================================================================================
+
+    const $popover = document.querySelector('.popover');
+    let positionInfo;
+
+    const update = () => {
+        //get 3 rect for calculation
+        const containerRect = getRect('.container');
+        const targetRect = getRect('.target');
+        const popoverRect = getRect('.popover');
+
+        //console.log(positions);
+
+        positionInfo = getBestPosition(
+            containerRect,
+            targetRect,
+            popoverRect,
+            //acceptable positions
+            positions,
+            //previous position info
+            positionInfo
+        );
+
+        //console.log(positionInfo);
+
+        $popover.style.left = `${positionInfo.left}px`;
+        $popover.style.top = `${positionInfo.top}px`;
+
+    };
+
+    update();
+
+
+    //===========================================================================================
+    const moveInfo = {
+        mx: 0,
+        my: 0,
+        tx: 0,
+        ty: 0
+    };
+
+    //const $container = document.querySelector('.container');
+    const $target = document.querySelector('.target');
+
+    const mousemoveHandler = (e) => {
+        const x = e.pageX - moveInfo.mx + moveInfo.tx;
+        const y = e.pageY - moveInfo.my + moveInfo.ty;
+
+        //console.log(x, y);
+
+        $target.style.left = `${x}px`;
+        $target.style.top = `${y}px`;
+
+        update();
+
+    };
+
+    const mouseupHandler = (e) => {
+        document.removeEventListener('mousemove', mousemoveHandler);
+        document.removeEventListener('mouseup', mouseupHandler);
+
+    };
+
+    $target.addEventListener('mousedown', (e) => {
+        moveInfo.mx = e.pageX;
+        moveInfo.my = e.pageY;
+        moveInfo.tx = e.target.offsetLeft;
+        moveInfo.ty = e.target.offsetTop;
+
+        //console.log(moveInfo);
+
+        document.addEventListener('mousemove', mousemoveHandler);
+        document.addEventListener('mouseup', mouseupHandler);
+    });
+
+    //===========================================================================================
+
+    const sizeHandler = () => {
+        $popover.style.width = document.querySelector('.pw').value;
+        $popover.style.height = document.querySelector('.ph').value;
+        update();
+    };
+
+    ['.pw', '.ph'].forEach((selector) => {
+        const $elem = document.querySelector(selector);
+        $elem.addEventListener('change', (e) => {
+            sizeHandler();
+        });
+    });
+    
+   </script>
+</body>
+</html>
