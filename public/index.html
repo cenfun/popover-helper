@@ -5,73 +5,18 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="icon" href="data:,">
     <title>popover-helper</title>
-    <style>
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }        
-
-        .container {
-            position: relative;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            width: 800px;
-            height: 600px;  
-            margin: 50px;
-        }
-
-        .container::before {
-            content: "container";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        .target {
-            position: absolute;
-            background-color: red;
-            box-sizing: border-box;
-            width: 120px;
-            height: 30px;
-            cursor: move;
-            font-size: 12px;
-            text-align: center;
-            line-height: 30px;
-            user-select: none;
-        }
-
-        .popover {
-            position: absolute;
-            background-color: green;
-            box-sizing: border-box;
-            width: 300px;
-            height: 200px;
-            pointer-events: none;
-        }
-
-        .popover::before {
-            content: "popover";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        .toolbar {
-            margin: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="popover.css" >
+    <!--inject:start-->
+    <script src="../dist/popover-helper.js"></script>
+    <!--inject:end-->
 </head>
 <body>
     <div class="container">
-        <div class="target">target (drag me)</div>
+        <div class="target">target (move me)</div>
     </div>
-    <div class="popover"></div>
+    <div class="popover">
+        <div class="popover-content">popover</div>
+    </div>
 
     <div class="toolbar">
         <div>
@@ -84,11 +29,10 @@
             height:
             <input type="text" value="200px" class="ph" />
         </div>
+        <div>
+            <button class="update">update</button>
+        </div>
     </div>
-
-   <!--inject:start-->
-   <script src="../dist/popover-helper.js"></script>
-   <!--inject:end-->
 
    <script>
     const {
@@ -138,7 +82,7 @@
     const update = () => {
         //get 3 rect for calculation
         const containerRect = getRect('.container');
-        const targetRect = getRect('.target');
+        const targetRect = getRect('.target', 10);
         const popoverRect = getRect('.popover');
 
         //console.log(positions);
@@ -154,9 +98,10 @@
         );
 
         //console.log(positionInfo);
-
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
+
+        $popover.className = `popover popover-${positionInfo.type}`;
 
     };
 
@@ -171,10 +116,6 @@
 
     //const $container = document.querySelector('.container');
     const $target = document.querySelector('.target');
-
-    $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
-    $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
-
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
@@ -223,7 +164,18 @@
 
     //===========================================================================================
 
+    const randomPosition = () => {
+        $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
+        $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
+    };
+
+    randomPosition();
     update();
+
+    document.querySelector('.update').addEventListener('click', () => {
+        randomPosition();
+        update();
+    });
     
    </script>
 </body>

@@ -18,7 +18,7 @@ let positionInfo;
 const update = () => {
     //get 3 rect for calculation
     const containerRect = getRect('.container');
-    const targetRect = getRect('.target');
+    const targetRect = getRect('.target', 10);
     const popoverRect = getRect('.popover');
     const positions = [];
 

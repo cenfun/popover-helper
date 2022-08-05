@@ -54,7 +54,7 @@ export const getElement = (selector) => {
     return document.querySelector(selector);
 };
 
-export const getRect = (target) => {
+export const getRect = (target, padding = 0) => {
     if (!target) {
         return toRect();
     }
@@ -81,6 +81,14 @@ export const getRect = (target) => {
     rect.top += window.pageYOffset;
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
+
+    //fix padding
+    if (padding) {
+        rect.left -= padding;
+        rect.top -= padding;
+        rect.width += padding * 2;
+        rect.height += padding * 2;
+    }
 
     //console.log(elem.tagName, rect);
 
