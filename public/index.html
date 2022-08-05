@@ -160,8 +160,6 @@
 
     };
 
-    update();
-
 
     //===========================================================================================
     const moveInfo = {
@@ -173,6 +171,9 @@
 
     //const $container = document.querySelector('.container');
     const $target = document.querySelector('.target');
+
+    $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
+    $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
 
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
@@ -219,6 +220,10 @@
             sizeHandler();
         });
     });
+
+    //===========================================================================================
+
+    update();
     
    </script>
 </body>
