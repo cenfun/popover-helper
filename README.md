@@ -33,17 +33,10 @@ const update = () => {
     );
 
     //console.log(positionInfo);
-    // positionInfo: {
-    //     position: String,
-    //     align: String,
-    //     top: Number,
-    //     left: Number,
-    //     width: Number,
-    //     height: Number
-    // }
 
     $popover.style.left = `${positionInfo.left}px`;
     $popover.style.top = `${positionInfo.top}px`;
+    $popover.className = `popover popover-${positionInfo.type}`;
 
 };
 
