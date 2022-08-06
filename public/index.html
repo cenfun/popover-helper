@@ -7,66 +7,72 @@
     <title>popover-helper</title>
     <link rel="stylesheet" href="popover.css" >
     <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        user-select: none;
+    }
 
-        .container {
-            position: relative;
-            border: 1px solid #ccc;
-            background-color: #f5f5f5;
-            box-sizing: border-box;
-            width: 800px;
-            height: 600px;
-            margin: 50px;
-        }
+    .container {
+        position: relative;
+        border: 1px solid #ccc;
+        background-color: #f5f5f5;
+        box-sizing: border-box;
+        width: 800px;
+        height: 600px;
+        margin: 50px;
+    }
 
-        .container::before {
-            content: "container";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
+    .container::before {
+        content: "container";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
 
-        .target {
-            position: absolute;
-            background-color: green;
-            color: #fff;
-            box-sizing: border-box;
-            border-radius: 3px;
-            width: 120px;
-            height: 30px;
-            cursor: move;
-            font-size: 12px;
-            text-align: center;
-            line-height: 30px;
-            left: 10px;
-            top: 10px;
-        }
+    .target {
+        position: absolute;
+        background-color: green;
+        color: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        width: 120px;
+        height: 30px;
+        cursor: move;
+        font-size: 12px;
+        text-align: center;
+        line-height: 30px;
+        left: 10px;
+        top: 10px;
+    }
 
-        .toolbar {
-            margin: 50px;
-        }
+    .toolbar {
+        margin: 50px;
+    }
 
-        .toolbar > * {
-            margin-bottom: 5px;
-        }
+    .toolbar > * {
+        margin-bottom: 5px;
+    }
 
-        .positions label {
-            display: block;
-        }
+    .positions label {
+        display: block;
+    }
 
-        .popover-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+    .popover {
+        width: 300px;
+        height: 200px;
+        padding: 10px;
+    }
+
+    .popover-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
     </style>
     <!--inject:start-->
     <script src="../dist/popover-helper.js"></script>
@@ -84,14 +90,18 @@
         <div>
             <button class="random">random target</button>
         </div>
+        <div>popover settings:</div>
         <div>
-            popover size:
-            <div>
-                width:
-                <input type="text" value="300px" class="pw" />
-                height:
-                <input type="text" value="200px" class="ph" />
-            </div>
+            width:
+            <input type="text" value="300px" class="popover-width" />
+            height:
+            <input type="text" value="200px" class="popover-height" />
+        </div>
+        <div>
+            border color:
+            <input type="text" value="#ccc" class="popover-border-color" />
+            bg color:
+            <input type="text" value="#fff" class="popover-bg-color" />
         </div>
         <div>
             allowed positions:
@@ -147,6 +157,7 @@
     const update = () => {
         //get 3 rect for calculation
         const containerRect = getRect('.container');
+        //10px for arrow spacing
         const targetRect = getRect('.target', 10);
         const popoverRect = getRect('.popover');
 
@@ -165,8 +176,7 @@
         //console.log(positionInfo);
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
-
-        $popover.className = `popover popover-${positionInfo.type}`;
+        $popover.className = `popover popover-${positionInfo.position} popover-${positionInfo.type}`;
 
     };
 
@@ -214,16 +224,20 @@
 
     //===========================================================================================
 
-    const sizeHandler = () => {
-        $popover.style.width = document.querySelector('.pw').value;
-        $popover.style.height = document.querySelector('.ph').value;
+    const popoverHandler = () => {
+        $popover.style.width = document.querySelector('.popover-width').value;
+        $popover.style.height = document.querySelector('.popover-height').value;
+
+        $popover.style.setProperty('--popover-border-color', document.querySelector('.popover-border-color').value);
+        $popover.style.setProperty('--popover-bg-color', document.querySelector('.popover-bg-color').value);
+
         update();
     };
 
-    ['.pw', '.ph'].forEach((selector) => {
+    ['.popover-width', '.popover-height', '.popover-border-color', '.popover-bg-color'].forEach((selector) => {
         const $elem = document.querySelector(selector);
         $elem.addEventListener('change', (e) => {
-            sizeHandler();
+            popoverHandler();
         });
     });
 

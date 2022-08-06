@@ -1,128 +1,234 @@
 .popover {
+    --popover-border-color: #ccc;
+    --popover-bg-color: #fff;
+
     position: absolute;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 6px;
+    border: 1px solid var(--popover-border-color);
+    background-color: var(--popover-bg-color);
+    border-radius: 10px;
     box-sizing: border-box;
-    width: 300px;
-    height: 200px;
 }
 
+/* popover-arrow */
+
+.popover::before,
 .popover::after {
     content: "";
     position: absolute;
-    width: 9px;
-    height: 9px;
-    background-image: url("./popover-arrow.svg");
-    background-size: 54px 54px;
-    background-repeat: no-repeat;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    box-sizing: border-box;
+    overflow: hidden;
     z-index: 1;
 }
 
-.popover-bottom-right {
-    border-top-left-radius: 0;
+/* popover-bottom */
+
+.popover-bottom::before,
+.popover-bottom::after {
+    top: -20px;
+}
+
+.popover-bottom::before {
+    border-bottom-color: var(--popover-border-color);
+}
+
+.popover-bottom::after {
+    border-bottom-color: var(--popover-bg-color);
+}
+
+.popover-bottom-center::before,
+.popover-bottom-center::after {
+    left: calc(50% - 10px);
+}
+
+.popover-bottom-center::after {
+    transform: translate(0, 1.42px);
+}
+
+.popover-bottom-right::before,
+.popover-bottom-right::after {
+    left: -1px;
+    border-left: transparent;
 }
 
 .popover-bottom-right::after {
-    background-position: -9px 0;
-    top: -9px;
+    transform: translate(1px, 2.42px);
+}
+
+.popover-bottom-left::before,
+.popover-bottom-left::after {
+    left: calc(100% - 9px);
+    border-right: transparent;
+}
+
+.popover-bottom-left::after {
+    transform: translate(-1px, 2.42px);
+}
+
+/* popover-top */
+
+.popover-top::before,
+.popover-top::after {
+    top: 100%;
+}
+
+.popover-top::before {
+    border-top-color: var(--popover-border-color);
+}
+
+.popover-top::after {
+    border-top-color: var(--popover-bg-color);
+}
+
+.popover-top-center::before,
+.popover-top-center::after {
+    left: calc(50% - 10px);
+}
+
+.popover-top-center::after {
+    transform: translate(0, -1.42px);
+}
+
+.popover-top-right::before,
+.popover-top-right::after {
     left: -1px;
+    border-left: transparent;
+}
+
+.popover-top-right::after {
+    transform: translate(1px, -2.42px);
+}
+
+.popover-top-left::before,
+.popover-top-left::after {
+    left: calc(100% - 9px);
+    border-right: transparent;
+}
+
+.popover-top-left::after {
+    transform: translate(-1px, -2.42px);
+}
+
+/* popover-right */
+
+.popover-right::before,
+.popover-right::after {
+    left: -20px;
+}
+
+.popover-right::before {
+    border-right-color: var(--popover-border-color);
+}
+
+.popover-right::after {
+    border-right-color: var(--popover-bg-color);
+}
+
+.popover-right-center::before,
+.popover-right-center::after {
+    top: calc(50% - 10px);
+}
+
+.popover-right-center::after {
+    transform: translate(1.42px, 0);
+}
+
+.popover-right-bottom::before,
+.popover-right-bottom::after {
+    top: -1px;
+    border-top: transparent;
+}
+
+.popover-right-bottom::after {
+    transform: translate(2.42px, 1px);
+}
+
+.popover-right-top::before,
+.popover-right-top::after {
+    top: calc(100% - 9px);
+    border-bottom: transparent;
+}
+
+.popover-right-top::after {
+    transform: translate(2.42px, -1px);
+}
+
+/* popover-left */
+
+.popover-left::before,
+.popover-left::after {
+    left: 100%;
+}
+
+.popover-left::before {
+    border-left-color: var(--popover-border-color);
+}
+
+.popover-left::after {
+    border-left-color: var(--popover-bg-color);
+}
+
+.popover-left-center::before,
+.popover-left-center::after {
+    top: calc(50% - 10px);
+}
+
+.popover-left-center::after {
+    transform: translate(-1.42px, 0);
+}
+
+.popover-left-bottom::before,
+.popover-left-bottom::after {
+    top: -1px;
+    border-top: transparent;
+}
+
+.popover-left-bottom::after {
+    transform: translate(-2.42px, 1px);
+}
+
+.popover-left-top::before,
+.popover-left-top::after {
+    top: calc(100% - 9px);
+    border-bottom: transparent;
+}
+
+.popover-left-top::after {
+    transform: translate(-2.42px, -1px);
+}
+
+/* popover-arrow-radius  */
+
+.popover-bottom-right {
+    border-top-left-radius: 0;
 }
 
 .popover-bottom-left {
     border-top-right-radius: 0;
 }
 
-.popover-bottom-center::after {
-    width: 18px;
-    background-position: -18px 0;
-    top: -9px;
-    left: calc(50% - 9px);
-}
-
-.popover-left-bottom {
-    border-top-right-radius: 0;
-}
-
-.popover-bottom-left::after {
-    background-position: -36px 0;
-    top: -9px;
-    left: calc(100% - 8px);
-}
-
-.popover-left-bottom::after {
-    background-position: -45px -9px;
-    top: -1px;
-    left: 100%;
-}
-
-.popover-left-center::after {
-    height: 18px;
-    background-position: -45px -18px;
-    top: calc(50% - 9px);
-    left: 100%;
-}
-
-.popover-left-top {
-    border-bottom-right-radius: 0;
-}
-
-.popover-left-top::after {
-    background-position: -45px -36px;
-    top: calc(100% - 8px);
-    left: 100%;
+.popover-top-right {
+    border-bottom-left-radius: 0;
 }
 
 .popover-top-left {
     border-bottom-right-radius: 0;
 }
 
-.popover-top-left::after {
-    background-position: -36px -45px;
-    top: 100%;
-    left: calc(100% - 8px);
-}
-
-.popover-top-right {
-    border-bottom-left-radius: 0;
-}
-
-.popover-top-center::after {
-    width: 18px;
-    background-position: -18px -45px;
-    top: 100%;
-    left: calc(50% - 9px);
+.popover-right-bottom {
+    border-top-left-radius: 0;
 }
 
 .popover-right-top {
     border-bottom-left-radius: 0;
 }
 
-.popover-top-right::after {
-    background-position: -9px -45px;
-    top: 100%;
-    left: -1px;
+.popover-left-bottom {
+    border-top-right-radius: 0;
 }
 
-.popover-right-top::after {
-    background-position: 0 -36px;
-    top: calc(100% - 8px);
-    left: -9px;
-}
-
-.popover-right-center::after {
-    height: 18px;
-    background-position: 0 -18px;
-    top: calc(50% - 9px);
-    left: -9px;
-}
-
-.popover-right-bottom {
-    border-top-left-radius: 0;
-}
-
-.popover-right-bottom::after {
-    background-position: 0 -9px;
-    top: -1px;
-    left: -9px;
+.popover-left-top {
+    border-bottom-right-radius: 0;
 }
