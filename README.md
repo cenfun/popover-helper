@@ -26,7 +26,7 @@ const update = () => {
         containerRect,
         targetRect,
         popoverRect,
-        //acceptable positions
+        //allowed positions
         positions,
         //previous position info
         positionInfo

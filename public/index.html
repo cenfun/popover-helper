@@ -6,6 +6,68 @@
     <link rel="icon" href="data:,">
     <title>popover-helper</title>
     <link rel="stylesheet" href="popover.css" >
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        .container {
+            position: relative;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            box-sizing: border-box;
+            width: 800px;
+            height: 600px;
+            margin: 50px;
+        }
+
+        .container::before {
+            content: "container";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .target {
+            position: absolute;
+            background-color: green;
+            color: #fff;
+            box-sizing: border-box;
+            border-radius: 3px;
+            width: 120px;
+            height: 30px;
+            cursor: move;
+            font-size: 12px;
+            text-align: center;
+            line-height: 30px;
+            left: 10px;
+            top: 10px;
+        }
+
+        .toolbar {
+            margin: 50px;
+        }
+
+        .toolbar > * {
+            margin-bottom: 5px;
+        }
+
+        .positions label {
+            display: block;
+        }
+
+        .popover-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
     <!--inject:start-->
     <script src="../dist/popover-helper.js"></script>
     <!--inject:end-->
@@ -20,17 +82,20 @@
 
     <div class="toolbar">
         <div>
-            acceptable positions:
-            <span class="positions"></span>
+            <button class="random">random target</button>
         </div>
         <div>
-            popover width:
-            <input type="text" value="300px" class="pw" />
-            height:
-            <input type="text" value="200px" class="ph" />
+            popover size:
+            <div>
+                width:
+                <input type="text" value="300px" class="pw" />
+                height:
+                <input type="text" value="200px" class="ph" />
+            </div>
         </div>
         <div>
-            <button class="update">update</button>
+            allowed positions:
+            <div class="positions"></div>
         </div>
     </div>
 
@@ -91,7 +156,7 @@
             containerRect,
             targetRect,
             popoverRect,
-            //acceptable positions
+            //allowed positions
             positions,
             //previous position info
             positionInfo
@@ -169,10 +234,9 @@
         $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
     };
 
-    randomPosition();
     update();
 
-    document.querySelector('.update').addEventListener('click', () => {
+    document.querySelector('.random').addEventListener('click', () => {
         randomPosition();
         update();
     });
