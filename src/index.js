@@ -39,19 +39,19 @@ export const toRect = (obj) => {
 };
 
 export const getElement = (selector) => {
-    if (typeof selector !== 'string') {
-        if (isDocument(selector)) {
-            return selector.body;
+    if (typeof selector === 'string' && selector) {
+        if (selector.startsWith('#')) {
+            return document.getElementById(selector.slice(1));
         }
-        if (isElement(selector)) {
-            return selector;
-        }
-        return;
+        return document.querySelector(selector);
     }
-    if (selector.startsWith('#')) {
-        return document.getElementById(selector.substr(1));
+
+    if (isDocument(selector)) {
+        return selector.body;
     }
-    return document.querySelector(selector);
+    if (isElement(selector)) {
+        return selector;
+    }
 };
 
 export const getRect = (target, padding = 0) => {
@@ -76,13 +76,13 @@ export const getRect = (target, padding = 0) => {
     const br = elem.getBoundingClientRect();
     const rect = toRect(br);
 
-    //fix offset
+    // fix offset
     rect.left += window.pageXOffset;
     rect.top += window.pageYOffset;
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
 
-    //fix padding
+    // fix padding
     if (padding) {
         rect.left -= padding;
         rect.top -= padding;
@@ -90,12 +90,12 @@ export const getRect = (target, padding = 0) => {
         rect.height += padding * 2;
     }
 
-    //console.log(elem.tagName, rect);
+    // console.log(elem.tagName, rect);
 
     return rect;
 };
 
-//===========================================================================================
+// ===========================================================================================
 
 export const defaultPositions = {
 
@@ -126,7 +126,7 @@ export const defaultPositions = {
         }
     },
 
-    //===========================================================================================
+    // ===========================================================================================
 
     'top-center': {
         direction: 'h',
@@ -155,7 +155,7 @@ export const defaultPositions = {
         }
     },
 
-    //===========================================================================================
+    // ===========================================================================================
 
     'right-center': {
         direction: 'v',
@@ -184,7 +184,7 @@ export const defaultPositions = {
         }
     },
 
-    //===========================================================================================
+    // ===========================================================================================
 
     'left-center': {
         direction: 'v',
@@ -229,7 +229,7 @@ export const getDefaultPositions = (sortKeys) => {
             ai = ai === -1 ? 4 : ai;
             bi = bi === -1 ? 4 : bi;
             if (ai === bi) {
-                //right part
+                // right part
                 av = al.shift();
                 bv = bl.shift();
                 ai = sortKeys.indexOf(av);
@@ -244,7 +244,7 @@ export const getDefaultPositions = (sortKeys) => {
     return list;
 };
 
-//===========================================================================================
+// ===========================================================================================
 
 const getSpaceAlign = (containerStart, containerSize, start, size) => {
     const s = start - containerStart;
@@ -276,7 +276,7 @@ const calculateChange = (info, previousInfo) => {
     if (!previousInfo) {
         return info;
     }
-    //no change if type no change with previous
+    // no change if type no change with previous
     if (info.type === previousInfo.type) {
         return info;
     }
@@ -349,10 +349,16 @@ const getTypeList = (positions, defaultList) => {
 export const getBestPosition = (containerRect, targetRect, rect, positions, previousInfo) => {
 
     const defaultList = getDefaultPositions();
+
+    let withOrder = true;
     let typeList = getTypeList(positions, defaultList);
     if (!typeList) {
         typeList = defaultList;
+        withOrder = false;
     }
+
+    // console.log('typeList', typeList);
+    // console.log('withOrder', withOrder);
 
     const infoList = typeList.map((type, i) => {
         return calculatePositionInfo(defaultPositions[type], i, type, containerRect, targetRect, rect, previousInfo);
@@ -365,13 +371,16 @@ export const getBestPosition = (containerRect, targetRect, rect, positions, prev
         if (previousInfo && a.priority === 2) {
             return a.change - b.change;
         }
+        if (withOrder) {
+            return a.index - b.index;
+        }
         if (a.space !== b.space) {
             return b.space - a.space;
         }
         return a.index - b.index;
     });
 
-    //console.table(infoList);
+    // console.table(infoList);
 
     return infoList[0];
 };

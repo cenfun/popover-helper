@@ -47,3 +47,9 @@ see [/public/index.html](/public/index.html)
 
 ## Popover CSS
 see [/public/popover.css](/public/popover.css)
+
+## CHANGELOG
+
+- 1.0.3
+    - added color to css
+    - fixed positions sort issue

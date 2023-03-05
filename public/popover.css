@@ -1,12 +1,14 @@
 .popover {
     --popover-border-color: #ccc;
     --popover-bg-color: #fff;
+    --popover-color: #000;
 
     position: absolute;
-    border: 1px solid var(--popover-border-color);
-    background-color: var(--popover-bg-color);
-    border-radius: 5px;
     box-sizing: border-box;
+    color: var(--popover-color);
+    border: 1px solid var(--popover-border-color);
+    border-radius: 5px;
+    background-color: var(--popover-bg-color);
     filter: drop-shadow(1px 2px 2px rgb(0 0 0 / 20%));
 }
 
@@ -14,15 +16,15 @@
 
 .popover::before,
 .popover::after {
-    pointer-events: none;
-    content: "";
     position: absolute;
+    content: "";
+    z-index: 1;
     width: 0;
     height: 0;
-    border: 10px solid transparent;
     box-sizing: border-box;
+    border: 10px solid transparent;
     overflow: hidden;
-    z-index: 1;
+    pointer-events: none;
 }
 
 /* popover-bottom */

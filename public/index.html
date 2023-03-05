@@ -16,37 +16,37 @@
 
     .container {
         position: relative;
-        border: 1px solid #ccc;
-        background-color: #f5f5f5;
-        box-sizing: border-box;
         width: 800px;
         height: 600px;
         margin: 50px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        background-color: #f5f5f5;
     }
 
     .container::before {
-        content: "container";
         position: absolute;
         top: 50%;
         left: 50%;
+        content: "container";
         transform: translate(-50%, -50%);
         pointer-events: none;
     }
 
     .target {
         position: absolute;
-        background-color: green;
-        color: #fff;
-        box-sizing: border-box;
-        border-radius: 3px;
+        top: 10px;
+        left: 10px;
         width: 120px;
         height: 30px;
-        cursor: move;
+        box-sizing: border-box;
+        color: #fff;
         font-size: 12px;
-        text-align: center;
         line-height: 30px;
-        left: 10px;
-        top: 10px;
+        text-align: center;
+        border-radius: 3px;
+        background-color: green;
+        cursor: move;
     }
 
     .toolbar {
@@ -102,6 +102,8 @@
             <input type="text" value="#ccc" class="popover-border-color" />
             bg color:
             <input type="text" value="#fff" class="popover-bg-color" />
+            color:
+            <input type="text" value="#000" class="popover-color" />
         </div>
         <div>
             allowed positions:
@@ -114,8 +116,8 @@
         getRect, getDefaultPositions, getBestPosition
     } = window['popover-helper'];
 
-    //===========================================================================================
-    //all positions
+    // ===========================================================================================
+    // all positions
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
     const allPositions = Array.from(new Set(defaultPositions.join('-').split('-'))).concat(defaultPositions);
@@ -149,31 +151,31 @@
         update();
     });
 
-    //===========================================================================================
+    // ===========================================================================================
 
     const $popover = document.querySelector('.popover');
     let positionInfo;
 
     const update = () => {
-        //get 3 rect for calculation
+        // get 3 rect for calculation
         const containerRect = getRect('.container');
-        //10px for arrow spacing
+        // 10px for arrow spacing
         const targetRect = getRect('.target', 10);
         const popoverRect = getRect('.popover');
 
-        //console.log(positions);
+        // console.log(positions);
 
         positionInfo = getBestPosition(
             containerRect,
             targetRect,
             popoverRect,
-            //allowed positions
+            // allowed positions
             positions,
-            //previous position info
+            // previous position info
             positionInfo
         );
 
-        //console.log(positionInfo);
+        // console.log(positionInfo);
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
         $popover.className = `popover popover-${positionInfo.position} popover-${positionInfo.type}`;
@@ -181,7 +183,7 @@
     };
 
 
-    //===========================================================================================
+    // ===========================================================================================
     const moveInfo = {
         mx: 0,
         my: 0,
@@ -189,13 +191,13 @@
         ty: 0
     };
 
-    //const $container = document.querySelector('.container');
+    // const $container = document.querySelector('.container');
     const $target = document.querySelector('.target');
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
 
-        //console.log(x, y);
+        // console.log(x, y);
 
         $target.style.left = `${x}px`;
         $target.style.top = `${y}px`;
@@ -216,13 +218,13 @@
         moveInfo.tx = e.target.offsetLeft;
         moveInfo.ty = e.target.offsetTop;
 
-        //console.log(moveInfo);
+        // console.log(moveInfo);
 
         document.addEventListener('mousemove', mousemoveHandler);
         document.addEventListener('mouseup', mouseupHandler);
     });
 
-    //===========================================================================================
+    // ===========================================================================================
 
     const popoverHandler = () => {
         $popover.style.width = document.querySelector('.popover-width').value;
@@ -230,18 +232,19 @@
 
         $popover.style.setProperty('--popover-border-color', document.querySelector('.popover-border-color').value);
         $popover.style.setProperty('--popover-bg-color', document.querySelector('.popover-bg-color').value);
+        $popover.style.setProperty('--popover-color', document.querySelector('.popover-color').value);
 
         update();
     };
 
-    ['.popover-width', '.popover-height', '.popover-border-color', '.popover-bg-color'].forEach((selector) => {
+    ['.popover-width', '.popover-height', '.popover-border-color', '.popover-bg-color', '.popover-color'].forEach((selector) => {
         const $elem = document.querySelector(selector);
         $elem.addEventListener('change', (e) => {
             popoverHandler();
         });
     });
 
-    //===========================================================================================
+    // ===========================================================================================
 
     const randomPosition = () => {
         $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
