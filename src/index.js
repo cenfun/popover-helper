@@ -24,8 +24,8 @@ const isElement = (obj) => {
 export const toRect = (obj) => {
     if (obj) {
         return {
-            left: toNum(obj.left),
-            top: toNum(obj.top),
+            left: toNum(obj.left || obj.x),
+            top: toNum(obj.top || obj.y),
             width: toNum(obj.width),
             height: toNum(obj.height)
         };
@@ -54,23 +54,33 @@ export const getElement = (selector) => {
     }
 };
 
+const addRectPadding = (rect, padding) => {
+    if (padding) {
+        rect.left -= padding;
+        rect.top -= padding;
+        rect.width += padding * 2;
+        rect.height += padding * 2;
+    }
+    return rect;
+};
+
 export const getRect = (target, padding = 0) => {
     if (!target) {
-        return toRect();
+        return addRectPadding(toRect(), padding);
     }
 
     if (isWindow(target)) {
-        return {
+        return addRectPadding({
             left: 0,
             top: 0,
             width: window.innerWidth,
             height: window.innerHeight
-        };
+        }, padding);
     }
 
     const elem = getElement(target);
     if (!elem) {
-        return toRect(target);
+        return addRectPadding(toRect(target), padding);
     }
 
     const br = elem.getBoundingClientRect();
@@ -82,17 +92,7 @@ export const getRect = (target, padding = 0) => {
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
 
-    // fix padding
-    if (padding) {
-        rect.left -= padding;
-        rect.top -= padding;
-        rect.width += padding * 2;
-        rect.height += padding * 2;
-    }
-
-    // console.log(elem.tagName, rect);
-
-    return rect;
+    return addRectPadding(rect, padding);
 };
 
 // ===========================================================================================

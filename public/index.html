@@ -58,6 +58,12 @@
         cursor: move;
     }
 
+    .virtual-target {
+        position: absolute;
+        border: 1px dashed red;
+        pointer-events: none;
+    }
+
     .toolbar {
         margin: 50px;
     }
@@ -131,6 +137,18 @@
             x
             <input type="text" value="30px" class="target-height" size="10" />
         </div>
+        <div>
+            target rect:
+            <select class="target-rect">
+                <option></option>
+                <option>x: 100, y: 100, width: 0, height: 0</option>
+                <option>x: 100, y: 100, width: 100, height: 30</option>
+                <option>x: 200, y: 100, width: 200, height: 100</option>
+                <option>x: "mouseX", y: "mouseY", width: 0, height: 0</option>
+                <option>x: "mouseX", y: "mouseY", width: 100, height: 30</option>
+                <option>x: "mouseX", y: "mouseY", width: 200, height: 100</option>
+            </select>
+        </div>
     </div>
 
    <script>
@@ -201,11 +219,16 @@
     const $popover = document.querySelector('.popover');
     let positionInfo;
 
+    let virtualTargetRect;
+
     const update = () => {
         // get 3 rect for calculation
         const containerRect = getRect('.container');
         // 10px for arrow spacing
-        const targetRect = getRect('.target', 10);
+        const arrowSize = 10;
+        const targetRect = getRect(virtualTargetRect || '.target', arrowSize);
+        console.log('targetRect', targetRect);
+
         const popoverRect = getRect('.popover');
 
         // console.log(positions);
@@ -267,10 +290,65 @@
         document.addEventListener('mouseup', mouseupHandler);
     });
 
+    let $virtualTarget;
+    const updateVirtualTarget = () => {
+        if (!virtualTargetRect) {
+            if ($virtualTarget) {
+                $virtualTarget.remove();
+                $virtualTarget = null;
+            }
+            return;
+        }
+
+        if (!$virtualTarget) {
+            $virtualTarget = document.createElement('div');
+            $virtualTarget.className = 'virtual-target';
+            document.body.appendChild($virtualTarget);
+        }
+
+        $virtualTarget.style.left = `${virtualTargetRect.x}px`;
+        $virtualTarget.style.top = `${virtualTargetRect.y}px`;
+        $virtualTarget.style.width = `${virtualTargetRect.width}px`;
+        $virtualTarget.style.height = `${virtualTargetRect.height}px`;
+
+    };
+
+    const virtualMouseMoveHandler = (e) => {
+        virtualTargetRect.x = e.pageX;
+        virtualTargetRect.y = e.pageY;
+        updateVirtualTarget();
+        update();
+    };
+
+    const virtualTargetHandler = (v) => {
+        if (!v) {
+            document.removeEventListener('mousemove', virtualMouseMoveHandler);
+            virtualTargetRect = null;
+            updateVirtualTarget();
+            update();
+            return;
+        }
+        virtualTargetRect = new Function(`return {${v}}`)();
+        console.log('virtualTargetRect', virtualTargetRect);
+
+        if (virtualTargetRect.x === 'mouseX') {
+            document.addEventListener('mousemove', virtualMouseMoveHandler);
+        } else {
+            updateVirtualTarget();
+            update();
+        }
+
+    };
+
+    const $targetRect = document.querySelector('.target-rect');
+    $targetRect.addEventListener('change', (e) => {
+        virtualTargetHandler(e.target.value);
+    });
+
     // ===========================================================================================
     
     // bind
-    [
+    const controls = [
         'popover-border-color',
         'popover-bg-color',
         'popover-color',
@@ -280,7 +358,8 @@
         'container-height',
         'target-width',
         'target-height'
-    ].forEach((id) => {
+    ];
+    controls.forEach((id) => {
         const $elem = document.querySelector(`.${id}`);
 
         const doms = {
