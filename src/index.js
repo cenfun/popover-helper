@@ -54,33 +54,34 @@ export const getElement = (selector) => {
     }
 };
 
-const addRectPadding = (rect, padding) => {
-    if (padding) {
-        rect.left -= padding;
-        rect.top -= padding;
-        rect.width += padding * 2;
-        rect.height += padding * 2;
+const addRectMargin = (rect, margin) => {
+    if (margin) {
+        margin = toNum(margin);
+        rect.left -= margin;
+        rect.top -= margin;
+        rect.width += margin * 2;
+        rect.height += margin * 2;
     }
     return rect;
 };
 
-export const getRect = (target, padding = 0) => {
+export const getRect = (target, margin) => {
     if (!target) {
-        return addRectPadding(toRect(), padding);
+        return addRectMargin(toRect(), margin);
     }
 
     if (isWindow(target)) {
-        return addRectPadding({
+        return addRectMargin({
             left: 0,
             top: 0,
             width: window.innerWidth,
             height: window.innerHeight
-        }, padding);
+        }, margin);
     }
 
     const elem = getElement(target);
     if (!elem) {
-        return addRectPadding(toRect(target), padding);
+        return addRectMargin(toRect(target), margin);
     }
 
     const br = elem.getBoundingClientRect();
@@ -92,7 +93,7 @@ export const getRect = (target, padding = 0) => {
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
 
-    return addRectPadding(rect, padding);
+    return addRectMargin(rect, margin);
 };
 
 // ===========================================================================================
