@@ -109,7 +109,7 @@
         </div>
         <div>
             positions: 
-            <span class="positions"></span>
+            <div class="positions"></div>
         </div>
 
         <h3>size settings:</h3>
@@ -139,24 +139,43 @@
     } = window['popover-helper'];
 
     // ===========================================================================================
+    const pos = localStorage.getItem('popover-positions') || '';
+    let positions = pos.split(',');
+
     // all positions
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
-    const allPositions = Array.from(new Set(defaultPositions.join('-').split('-'))).concat(defaultPositions);
-    allPositions.forEach((item, i) => {
-        const label = document.createElement('label');
-        const input = document.createElement('input');
-        input.className = 'position';
-        input.setAttribute('type', 'checkbox');
-        input.setAttribute('value', item);
-        label.appendChild(input);
-        const span = document.createElement('span');
-        span.innerText = item;
-        label.appendChild(span);
-        $positions.appendChild(label);
+
+    const groups = [];
+    groups.push(Array.from(new Set(defaultPositions.join('-').split('-'))));
+    groups.push(Array.from(new Set(defaultPositions.map((it) => `${it.split('-').shift()}-`))));
+    groups.push(Array.from(new Set(defaultPositions.map((it) => `-${it.split('-').pop()}`))));
+    groups.push(defaultPositions.filter((it) => it.startsWith('bottom')));
+    groups.push(defaultPositions.filter((it) => it.startsWith('top')));
+    groups.push(defaultPositions.filter((it) => it.startsWith('right')));
+    groups.push(defaultPositions.filter((it) => it.startsWith('left')));
+
+    groups.forEach((group) => {
+        const $group = document.createElement('div');
+        $positions.appendChild($group);
+        group.forEach((item) => {
+            const label = document.createElement('label');
+            const input = document.createElement('input');
+            input.className = 'position';
+            input.setAttribute('type', 'checkbox');
+            input.setAttribute('value', item);
+            if (positions.includes(item)) {
+                input.setAttribute('checked', 'checked');
+            }
+            label.appendChild(input);
+            const span = document.createElement('span');
+            span.innerText = item;
+    
+            label.appendChild(span);
+            $group.appendChild(label);
+        });
     });
 
-    let positions = [];
     const updatePositions = () => {
         positions = [];
         Array.from(document.querySelectorAll('.position')).forEach((elem) => {
@@ -165,6 +184,7 @@
             }
         });
         console.log(positions);
+        localStorage.setItem('popover-positions', positions.join(','));
     };
     updatePositions();
 
