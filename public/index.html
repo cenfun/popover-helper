@@ -9,15 +9,21 @@
     <style>
     html,
     body {
+        width: 100%;
+        height: 100%;
         margin: 0;
         padding: 0;
+        overflow: hidden;
         user-select: none;
     }
 
     .container {
+        --container-width: 800px;
+        --container-height: 600px;
+
         position: relative;
-        width: 800px;
-        height: 600px;
+        width: var(--container-width);
+        height: var(--container-height);
         margin: 50px;
         box-sizing: border-box;
         border: 1px solid #ccc;
@@ -34,11 +40,14 @@
     }
 
     .target {
+        --target-width: 120px;
+        --target-height: 30px;
+
         position: absolute;
         top: 10px;
         left: 10px;
-        width: 120px;
-        height: 30px;
+        width: var(--target-width);
+        height: var(--target-height);
         box-sizing: border-box;
         color: #fff;
         font-size: 12px;
@@ -57,13 +66,12 @@
         margin-bottom: 5px;
     }
 
-    .positions label {
-        display: block;
-    }
-
     .popover {
-        width: 300px;
-        height: 200px;
+        --popover-width: 300px;
+        --popover-height: 200px;
+
+        width: var(--popover-width);
+        height: var(--popover-height);
         padding: 10px;
     }
 
@@ -90,13 +98,7 @@
         <div>
             <button class="random">random target</button>
         </div>
-        <div>popover settings:</div>
-        <div>
-            width:
-            <input type="text" value="300px" class="popover-width" />
-            height:
-            <input type="text" value="200px" class="popover-height" />
-        </div>
+        <h3>popover settings:</h3>
         <div>
             border color:
             <input type="text" value="#ccc" class="popover-border-color" />
@@ -106,8 +108,28 @@
             <input type="text" value="#000" class="popover-color" />
         </div>
         <div>
-            allowed positions:
-            <div class="positions"></div>
+            positions: 
+            <span class="positions"></span>
+        </div>
+
+        <h3>size settings:</h3>
+        <div>
+            popover width/height:
+            <input type="text" value="300px" class="popover-width" size="10" />
+            x
+            <input type="text" value="200px" class="popover-height" size="10" />
+        </div>
+        <div>
+            container width/height:
+            <input type="text" value="800px" class="container-width" size="10" />
+            x
+            <input type="text" value="600px" class="container-height" size="10" />
+        </div>
+        <div>
+            target width/height:
+            <input type="text" value="120px" class="target-width" size="10" />
+            x
+            <input type="text" value="30px" class="target-height" size="10" />
         </div>
     </div>
 
@@ -153,6 +175,9 @@
 
     // ===========================================================================================
 
+    const $container = document.querySelector('.container');
+    const $target = document.querySelector('.target');
+
     const $popover = document.querySelector('.popover');
     let positionInfo;
 
@@ -191,8 +216,6 @@
         ty: 0
     };
 
-    // const $container = document.querySelector('.container');
-    const $target = document.querySelector('.target');
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
@@ -225,22 +248,43 @@
     });
 
     // ===========================================================================================
+    
+    // bind
+    [
+        'popover-border-color',
+        'popover-bg-color',
+        'popover-color',
+        'popover-width',
+        'popover-height',
+        'container-width',
+        'container-height',
+        'target-width',
+        'target-height'
+    ].forEach((id) => {
+        const $elem = document.querySelector(`.${id}`);
 
-    const popoverHandler = () => {
-        $popover.style.width = document.querySelector('.popover-width').value;
-        $popover.style.height = document.querySelector('.popover-height').value;
+        const doms = {
+            popover: $popover,
+            container: $container,
+            target: $target
+        };
 
-        $popover.style.setProperty('--popover-border-color', document.querySelector('.popover-border-color').value);
-        $popover.style.setProperty('--popover-bg-color', document.querySelector('.popover-bg-color').value);
-        $popover.style.setProperty('--popover-color', document.querySelector('.popover-color').value);
+        const $dom = doms[id.split('-').shift()];
 
-        update();
-    };
+        const value = localStorage.getItem(id);
+        if (value) {
+            $elem.value = value;
+            $dom.style.setProperty(`--${id}`, value);
 
-    ['.popover-width', '.popover-height', '.popover-border-color', '.popover-bg-color', '.popover-color'].forEach((selector) => {
-        const $elem = document.querySelector(selector);
+        }
+
         $elem.addEventListener('change', (e) => {
-            popoverHandler();
+
+            const v = e.target.value;
+            localStorage.setItem(id, v);
+            $dom.style.setProperty(`--${id}`, v);
+
+            update();
         });
     });
 
