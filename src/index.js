@@ -103,7 +103,7 @@ export const defaultPositions = {
     'bottom-center': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.positionSpace = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width * 0.5);
         }
@@ -112,7 +112,7 @@ export const defaultPositions = {
     'bottom-right': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.positionSpace = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5);
         }
@@ -121,7 +121,7 @@ export const defaultPositions = {
     'bottom-left': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
+            info.positionSpace = containerRect.top + containerRect.height - targetRect.top - targetRect.height - rect.height;
             info.top = targetRect.top + targetRect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width);
         }
@@ -132,7 +132,7 @@ export const defaultPositions = {
     'top-center': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.positionSpace = targetRect.top - rect.height - containerRect.top;
             info.top = targetRect.top - rect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width * 0.5);
         }
@@ -141,7 +141,7 @@ export const defaultPositions = {
     'top-right': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.positionSpace = targetRect.top - rect.height - containerRect.top;
             info.top = targetRect.top - rect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5);
         }
@@ -150,7 +150,7 @@ export const defaultPositions = {
     'top-left': {
         direction: 'h',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.top - rect.height - containerRect.top;
+            info.positionSpace = targetRect.top - rect.height - containerRect.top;
             info.top = targetRect.top - rect.height;
             info.left = Math.round(targetRect.left + targetRect.width * 0.5 - rect.width);
         }
@@ -161,7 +161,7 @@ export const defaultPositions = {
     'right-center': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.positionSpace = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height * 0.5);
             info.left = targetRect.left + targetRect.width;
         }
@@ -170,7 +170,7 @@ export const defaultPositions = {
     'right-bottom': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.positionSpace = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5);
             info.left = targetRect.left + targetRect.width;
         }
@@ -179,7 +179,7 @@ export const defaultPositions = {
     'right-top': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
+            info.positionSpace = containerRect.left + containerRect.width - targetRect.left - targetRect.width - rect.width;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height);
             info.left = targetRect.left + targetRect.width;
         }
@@ -190,7 +190,7 @@ export const defaultPositions = {
     'left-center': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width - containerRect.left;
+            info.positionSpace = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height * 0.5);
             info.left = targetRect.left - rect.width;
         }
@@ -199,7 +199,7 @@ export const defaultPositions = {
     'left-bottom': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width - containerRect.left;
+            info.positionSpace = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5);
             info.left = targetRect.left - rect.width;
         }
@@ -208,7 +208,7 @@ export const defaultPositions = {
     'left-top': {
         direction: 'v',
         calculate: (info, containerRect, targetRect, rect) => {
-            info.spacePosition = targetRect.left - rect.width - containerRect.left;
+            info.positionSpace = targetRect.left - rect.width - containerRect.left;
             info.top = Math.round(targetRect.top + targetRect.height * 0.5 - rect.height);
             info.left = targetRect.left - rect.width;
         }
@@ -255,20 +255,20 @@ const getSpaceAlign = (containerStart, containerSize, start, size) => {
 
 const calculateSpace = (info, containerRect) => {
     if (info.direction === 'h') {
-        info.spaceAlign += getSpaceAlign(containerRect.left, containerRect.width, info.left, info.width);
+        info.alignSpace += getSpaceAlign(containerRect.left, containerRect.width, info.left, info.width);
     } else {
-        info.spaceAlign += getSpaceAlign(containerRect.top, containerRect.height, info.top, info.height);
+        info.alignSpace += getSpaceAlign(containerRect.top, containerRect.height, info.top, info.height);
     }
-    info.space = Math.min(info.spacePosition, info.spaceAlign);
+    info.space = Math.min(info.positionSpace, info.alignSpace);
     return info;
 };
 
-const calculatePriority = (info) => {
-    if (info.spacePosition >= 0) {
-        info.priority += 1;
+const calculateSpaceLevel = (info) => {
+    if (info.positionSpace >= 0) {
+        info.spaceLevel += 1;
     }
-    if (info.spaceAlign >= 0) {
-        info.priority += 1;
+    if (info.alignSpace >= 0) {
+        info.spaceLevel += 1;
     }
     return info;
 };
@@ -295,24 +295,28 @@ const calculatePositionInfo = (defaultInfo, index, type, containerRect, targetRe
     const [position, align] = type.split('-');
     let info = {
         ... defaultInfo,
+        index,
         type,
-        position,
-        align,
+
         top: 0,
         left: 0,
         width: rect.width,
         height: rect.height,
-        spacePosition: 0,
-        spaceAlign: 0,
-        priority: 0,
-        change: 0,
+
+        position,
+        positionSpace: 0,
+        align,
+        alignSpace: 0,
+
         space: 0,
-        index
+        spaceLevel: 0,
+
+        change: 0
     };
     info.calculate(info, containerRect, targetRect, rect);
     delete info.calculate;
     info = calculateSpace(info, containerRect);
-    info = calculatePriority(info);
+    info = calculateSpaceLevel(info);
     info = calculateChange(info, previousInfo);
     return info;
 };
@@ -366,10 +370,10 @@ export const getBestPosition = (containerRect, targetRect, rect, positions, prev
     });
 
     infoList.sort((a, b) => {
-        if (a.priority !== b.priority) {
-            return b.priority - a.priority;
+        if (a.spaceLevel !== b.spaceLevel) {
+            return b.spaceLevel - a.spaceLevel;
         }
-        if (previousInfo && a.priority === 2) {
+        if (previousInfo && a.spaceLevel === 2) {
             return a.change - b.change;
         }
         if (withOrder) {
