@@ -5,88 +5,91 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="icon" href="data:,">
     <title>popover-helper</title>
-    <link rel="stylesheet" href="popover.css" >
     <style>
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        user-select: none;
-    }
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    user-select: none;
+}
 
-    .container {
-        --container-width: 800px;
-        --container-height: 600px;
+.container {
+    --container-width: 800px;
+    --container-height: 600px;
 
-        position: relative;
-        width: var(--container-width);
-        height: var(--container-height);
-        margin: 50px;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        background-color: #f5f5f5;
-    }
+    position: relative;
+    width: var(--container-width);
+    height: var(--container-height);
+    margin: 50px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+}
 
-    .container::before {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        content: "container";
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-    }
+.container::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: "container";
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
 
-    .target {
-        --target-width: 120px;
-        --target-height: 30px;
+.target {
+    --target-width: 120px;
+    --target-height: 30px;
 
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: var(--target-width);
-        height: var(--target-height);
-        box-sizing: border-box;
-        color: #fff;
-        font-size: 12px;
-        line-height: 30px;
-        text-align: center;
-        border-radius: 3px;
-        background-color: green;
-        cursor: move;
-    }
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: var(--target-width);
+    height: var(--target-height);
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 12px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 3px;
+    background-color: green;
+    cursor: move;
+}
 
-    .virtual-target {
-        position: absolute;
-        border: 1px dashed red;
-        pointer-events: none;
-    }
+.virtual-target {
+    position: absolute;
+    border: 1px dashed red;
+    pointer-events: none;
+}
 
-    .toolbar {
-        margin: 50px;
-    }
+.toolbar {
+    margin: 50px;
+}
 
-    .toolbar > * {
-        margin-bottom: 5px;
-    }
+.toolbar > * {
+    margin-bottom: 5px;
+}
 
-    .popover {
-        --popover-width: 300px;
-        --popover-height: 200px;
+.popover {
+    --popover-color: #000;
+    --popover-width: 300px;
+    --popover-height: 200px;
 
-        width: var(--popover-width);
-        height: var(--popover-height);
-        padding: 10px;
-    }
+    position: absolute;
+    width: var(--popover-width);
+    height: var(--popover-height);
+    box-sizing: border-box;
+    color: var(--popover-color);
+    filter: drop-shadow(1px 2px 2px rgb(0 0 0 / 20%));
+}
 
-    .popover-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.popover-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
     </style>
     <!--inject:start-->
     <script src="../dist/popover-helper.js"></script>
@@ -115,7 +118,7 @@
         </div>
         <div>
             positions: 
-            <div class="positions"></div>
+            <span class="positions"></span>
         </div>
 
         <h3>size settings:</h3>
@@ -153,7 +156,7 @@
 
    <script>
     const {
-        getRect, getDefaultPositions, getBestPosition
+        getRect, getDefaultPositions, getBestPosition, getPositionStyle
     } = window['popover-helper'];
 
     // ===========================================================================================
@@ -164,34 +167,21 @@
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
 
-    const groups = [];
-    groups.push(Array.from(new Set(defaultPositions.join('-').split('-'))));
-    groups.push(Array.from(new Set(defaultPositions.map((it) => `${it.split('-').shift()}-`))));
-    groups.push(Array.from(new Set(defaultPositions.map((it) => `-${it.split('-').pop()}`))));
-    groups.push(defaultPositions.filter((it) => it.startsWith('bottom')));
-    groups.push(defaultPositions.filter((it) => it.startsWith('top')));
-    groups.push(defaultPositions.filter((it) => it.startsWith('right')));
-    groups.push(defaultPositions.filter((it) => it.startsWith('left')));
-
-    groups.forEach((group) => {
-        const $group = document.createElement('div');
-        $positions.appendChild($group);
-        group.forEach((item) => {
-            const label = document.createElement('label');
-            const input = document.createElement('input');
-            input.className = 'position';
-            input.setAttribute('type', 'checkbox');
-            input.setAttribute('value', item);
-            if (positions.includes(item)) {
-                input.setAttribute('checked', 'checked');
-            }
-            label.appendChild(input);
-            const span = document.createElement('span');
-            span.innerText = item;
+    defaultPositions.forEach((item) => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.className = 'position';
+        input.setAttribute('type', 'checkbox');
+        input.setAttribute('value', item);
+        if (positions.includes(item)) {
+            input.setAttribute('checked', 'checked');
+        }
+        label.appendChild(input);
+        const span = document.createElement('span');
+        span.innerText = item;
     
-            label.appendChild(span);
-            $group.appendChild(label);
-        });
+        label.appendChild(span);
+        $positions.appendChild(label);
     });
 
     const updatePositions = () => {
@@ -221,12 +211,10 @@
 
     let virtualTargetRect;
 
-    const update = () => {
+    const updateSync = () => {
         // get 3 rect for calculation
         const containerRect = getRect('.container');
-        // 10px margin for arrow
-        const arrowSize = 10;
-        const targetRect = getRect(virtualTargetRect || '.target', arrowSize);
+        const targetRect = getRect(virtualTargetRect || '.target');
         // console.log('targetRect', targetRect);
 
         const popoverRect = getRect('.popover');
@@ -243,11 +231,28 @@
             positionInfo
         );
 
+        const style = getPositionStyle(positionInfo, {
+            bgColor: $popover.style.getPropertyValue('--popover-bg-color'),
+            borderColor: $popover.style.getPropertyValue('--popover-border-color'),
+            borderWidth: 1
+        });
+
+        // console.log(style);
+
         // console.log(positionInfo);
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
-        $popover.className = `popover popover-${positionInfo.position} popover-${positionInfo.type}`;
+        $popover.style.background = style.background;
+        $popover.style.padding = style.padding;
 
+    };
+
+    // let time_id;
+    const update = () => {
+        // clearTimeout(time_id);
+        // time_id = setTimeout(() => {
+        updateSync();
+        // }, 10);
     };
 
 
@@ -259,23 +264,34 @@
         ty: 0
     };
 
+    const updateTarget = (x, y) => {
+        if (x) {
+            localStorage.setItem('target-x', x);
+        } else {
+            x = localStorage.getItem('target-x');
+        }
+        if (y) {
+            localStorage.setItem('target-y', y);
+        } else {
+            y = localStorage.getItem('target-y');
+        }
+        $target.style.left = `${x}px`;
+        $target.style.top = `${y}px`;
+    };
+
+    updateTarget();
+
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
-
         // console.log(x, y);
-
-        $target.style.left = `${x}px`;
-        $target.style.top = `${y}px`;
-
+        updateTarget(x, y);
         update();
-
     };
-
+    
     const mouseupHandler = (e) => {
         document.removeEventListener('mousemove', mousemoveHandler);
         document.removeEventListener('mouseup', mouseupHandler);
-
     };
 
     $target.addEventListener('mousedown', (e) => {
