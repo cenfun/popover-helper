@@ -1,6 +1,6 @@
 {
     "name": "popover-helper",
-    "version": "1.0.3",
+    "version": "2.0.0",
     "description": "popover-helper",
     "main": "dist/popover-helper.js",
     "scripts": {
@@ -9,15 +9,13 @@
         "pack": "sf pack -o docs -q v={version}"
     },
     "files": [
-        "src",
-        "dist"
+        "src"
     ],
     "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/cenfun/popover-helper.git"
     },
-    "homepage": "https://github.com/cenfun/popover-helper#readme",
     "dependencies": {},
     "devDependencies": {
         "eslint": "^8.36.0",

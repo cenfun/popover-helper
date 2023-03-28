@@ -9,7 +9,7 @@ npm i popover-helper
 
 ## Usage
 ```js
-import { getRect, getBestPosition } from "popover-helper";
+import { getRect, getBestPosition, getPositionStyle } from "popover-helper";
 
 const $popover = document.querySelector('.popover');
 let positionInfo;
@@ -17,8 +17,7 @@ let positionInfo;
 const update = () => {
     //get 3 rect for calculation
     const containerRect = getRect('.container');
-    //10px for arrow spacing
-    const targetRect = getRect('.target', 10);
+    const targetRect = getRect('.target');
     const popoverRect = getRect('.popover');
     const positions = [];
 
@@ -34,9 +33,15 @@ const update = () => {
 
     //console.log(positionInfo);
 
+    const style = getPositionStyle(positionInfo, {
+        bgColor: "#fff",
+        borderColor: "#ccc"
+    });
+
     $popover.style.left = `${positionInfo.left}px`;
     $popover.style.top = `${positionInfo.top}px`;
-    $popover.className = `popover popover-${positionInfo.position} popover-${positionInfo.type}`;
+    $popover.style.background = style.background;
+    $popover.style.padding = style.padding;
 
 };
 
@@ -45,10 +50,10 @@ update();
 ```
 see [/public/index.html](/public/index.html)
 
-## Popover CSS
-see [/public/popover.css](/public/popover.css)
-
 ## CHANGELOG
+
+- 2.0.0
+    - replaced css arrow with svg background
 
 - 1.0.3
     - added color to css

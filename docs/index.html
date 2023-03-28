@@ -5,77 +5,94 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="icon" href="data:,">
     <title>popover-helper</title>
-    <link rel="stylesheet" href="popover.css" >
     <style>
-    html,
-    body {
-        margin: 0;
-        padding: 0;
-        user-select: none;
-    }
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    user-select: none;
+}
 
-    .container {
-        position: relative;
-        width: 800px;
-        height: 600px;
-        margin: 50px;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        background-color: #f5f5f5;
-    }
+.container {
+    --container-width: 800px;
+    --container-height: 600px;
 
-    .container::before {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        content: "container";
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-    }
+    position: relative;
+    width: var(--container-width);
+    height: var(--container-height);
+    margin: 50px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+}
 
-    .target {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 120px;
-        height: 30px;
-        box-sizing: border-box;
-        color: #fff;
-        font-size: 12px;
-        line-height: 30px;
-        text-align: center;
-        border-radius: 3px;
-        background-color: green;
-        cursor: move;
-    }
+.container::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: "container";
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
 
-    .toolbar {
-        margin: 50px;
-    }
+.target {
+    --target-width: 120px;
+    --target-height: 30px;
 
-    .toolbar > * {
-        margin-bottom: 5px;
-    }
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: var(--target-width);
+    height: var(--target-height);
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 12px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 3px;
+    background-color: green;
+    cursor: move;
+}
 
-    .positions label {
-        display: block;
-    }
+.virtual-target {
+    position: absolute;
+    border: 1px dashed red;
+    pointer-events: none;
+}
 
-    .popover {
-        width: 300px;
-        height: 200px;
-        padding: 10px;
-    }
+.toolbar {
+    margin: 50px;
+}
 
-    .popover-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.toolbar > * {
+    margin-bottom: 5px;
+}
+
+.popover {
+    --popover-color: #000;
+    --popover-width: 300px;
+    --popover-height: 200px;
+
+    position: absolute;
+    width: var(--popover-width);
+    height: var(--popover-height);
+    box-sizing: border-box;
+    color: var(--popover-color);
+    filter: drop-shadow(1px 2px 2px rgb(0 0 0 / 20%));
+}
+
+.popover-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
     </style>
     <!--inject:start-->
-    <script src="dist/popover-helper.js?v=1.0.3"></script>
+    <script src="dist/popover-helper.js?v=2.0.0"></script>
     <!--inject:end-->
 </head>
 <body>
@@ -90,13 +107,7 @@
         <div>
             <button class="random">random target</button>
         </div>
-        <div>popover settings:</div>
-        <div>
-            width:
-            <input type="text" value="300px" class="popover-width" />
-            height:
-            <input type="text" value="200px" class="popover-height" />
-        </div>
+        <h3>popover settings:</h3>
         <div>
             border color:
             <input type="text" value="#ccc" class="popover-border-color" />
@@ -106,35 +117,73 @@
             <input type="text" value="#000" class="popover-color" />
         </div>
         <div>
-            allowed positions:
-            <div class="positions"></div>
+            positions: 
+            <span class="positions"></span>
+        </div>
+
+        <h3>size settings:</h3>
+        <div>
+            popover width/height:
+            <input type="text" value="300px" class="popover-width" size="10" />
+            x
+            <input type="text" value="200px" class="popover-height" size="10" />
+        </div>
+        <div>
+            container width/height:
+            <input type="text" value="800px" class="container-width" size="10" />
+            x
+            <input type="text" value="600px" class="container-height" size="10" />
+        </div>
+        <div>
+            target width/height:
+            <input type="text" value="120px" class="target-width" size="10" />
+            x
+            <input type="text" value="30px" class="target-height" size="10" />
+        </div>
+        <div>
+            target rect:
+            <select class="target-rect">
+                <option></option>
+                <option>x: 100, y: 100, width: 0, height: 0</option>
+                <option>x: 100, y: 100, width: 100, height: 30</option>
+                <option>x: 200, y: 100, width: 200, height: 100</option>
+                <option>x: "mouseX", y: "mouseY", width: 0, height: 0</option>
+                <option>x: "mouseX", y: "mouseY", width: 100, height: 30</option>
+                <option>x: "mouseX", y: "mouseY", width: 200, height: 100</option>
+            </select>
         </div>
     </div>
 
    <script>
     const {
-        getRect, getDefaultPositions, getBestPosition
+        getRect, getDefaultPositions, getBestPosition, getPositionStyle
     } = window['popover-helper'];
 
     // ===========================================================================================
+    const pos = localStorage.getItem('popover-positions') || '';
+    let positions = pos.split(',');
+
     // all positions
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
-    const allPositions = Array.from(new Set(defaultPositions.join('-').split('-'))).concat(defaultPositions);
-    allPositions.forEach((item, i) => {
+
+    defaultPositions.forEach((item) => {
         const label = document.createElement('label');
         const input = document.createElement('input');
         input.className = 'position';
         input.setAttribute('type', 'checkbox');
         input.setAttribute('value', item);
+        if (positions.includes(item)) {
+            input.setAttribute('checked', 'checked');
+        }
         label.appendChild(input);
         const span = document.createElement('span');
         span.innerText = item;
+    
         label.appendChild(span);
         $positions.appendChild(label);
     });
 
-    let positions = [];
     const updatePositions = () => {
         positions = [];
         Array.from(document.querySelectorAll('.position')).forEach((elem) => {
@@ -143,6 +192,7 @@
             }
         });
         console.log(positions);
+        localStorage.setItem('popover-positions', positions.join(','));
     };
     updatePositions();
 
@@ -153,14 +203,20 @@
 
     // ===========================================================================================
 
+    const $container = document.querySelector('.container');
+    const $target = document.querySelector('.target');
+
     const $popover = document.querySelector('.popover');
     let positionInfo;
 
-    const update = () => {
+    let virtualTargetRect;
+
+    const updateSync = () => {
         // get 3 rect for calculation
         const containerRect = getRect('.container');
-        // 10px for arrow spacing
-        const targetRect = getRect('.target', 10);
+        const targetRect = getRect(virtualTargetRect || '.target');
+        // console.log('targetRect', targetRect);
+
         const popoverRect = getRect('.popover');
 
         // console.log(positions);
@@ -175,11 +231,27 @@
             positionInfo
         );
 
+        const style = getPositionStyle(positionInfo, {
+            bgColor: $popover.style.getPropertyValue('--popover-bg-color'),
+            borderColor: $popover.style.getPropertyValue('--popover-border-color')
+        });
+
+        // console.log(style);
+
         // console.log(positionInfo);
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
-        $popover.className = `popover popover-${positionInfo.position} popover-${positionInfo.type}`;
+        $popover.style.background = style.background;
+        $popover.style.padding = style.padding;
 
+    };
+
+    // let time_id;
+    const update = () => {
+        // clearTimeout(time_id);
+        // time_id = setTimeout(() => {
+        updateSync();
+        // }, 10);
     };
 
 
@@ -191,25 +263,34 @@
         ty: 0
     };
 
-    // const $container = document.querySelector('.container');
-    const $target = document.querySelector('.target');
+    const updateTarget = (x, y) => {
+        if (x) {
+            localStorage.setItem('target-x', x);
+        } else {
+            x = localStorage.getItem('target-x');
+        }
+        if (y) {
+            localStorage.setItem('target-y', y);
+        } else {
+            y = localStorage.getItem('target-y');
+        }
+        $target.style.left = `${x}px`;
+        $target.style.top = `${y}px`;
+    };
+
+    updateTarget();
+
     const mousemoveHandler = (e) => {
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
-
         // console.log(x, y);
-
-        $target.style.left = `${x}px`;
-        $target.style.top = `${y}px`;
-
+        updateTarget(x, y);
         update();
-
     };
-
+    
     const mouseupHandler = (e) => {
         document.removeEventListener('mousemove', mousemoveHandler);
         document.removeEventListener('mouseup', mouseupHandler);
-
     };
 
     $target.addEventListener('mousedown', (e) => {
@@ -224,31 +305,110 @@
         document.addEventListener('mouseup', mouseupHandler);
     });
 
-    // ===========================================================================================
+    let $virtualTarget;
+    const updateVirtualTarget = () => {
+        if (!virtualTargetRect) {
+            if ($virtualTarget) {
+                $virtualTarget.remove();
+                $virtualTarget = null;
+            }
+            return;
+        }
 
-    const popoverHandler = () => {
-        $popover.style.width = document.querySelector('.popover-width').value;
-        $popover.style.height = document.querySelector('.popover-height').value;
+        if (!$virtualTarget) {
+            $virtualTarget = document.createElement('div');
+            $virtualTarget.className = 'virtual-target';
+            document.body.appendChild($virtualTarget);
+        }
 
-        $popover.style.setProperty('--popover-border-color', document.querySelector('.popover-border-color').value);
-        $popover.style.setProperty('--popover-bg-color', document.querySelector('.popover-bg-color').value);
-        $popover.style.setProperty('--popover-color', document.querySelector('.popover-color').value);
+        $virtualTarget.style.left = `${virtualTargetRect.x}px`;
+        $virtualTarget.style.top = `${virtualTargetRect.y}px`;
+        $virtualTarget.style.width = `${virtualTargetRect.width}px`;
+        $virtualTarget.style.height = `${virtualTargetRect.height}px`;
 
+    };
+
+    const virtualMouseMoveHandler = (e) => {
+        virtualTargetRect.x = e.pageX;
+        virtualTargetRect.y = e.pageY;
+        updateVirtualTarget();
         update();
     };
 
-    ['.popover-width', '.popover-height', '.popover-border-color', '.popover-bg-color', '.popover-color'].forEach((selector) => {
-        const $elem = document.querySelector(selector);
+    const virtualTargetHandler = (v) => {
+        if (!v) {
+            document.removeEventListener('mousemove', virtualMouseMoveHandler);
+            virtualTargetRect = null;
+            updateVirtualTarget();
+            update();
+            return;
+        }
+        virtualTargetRect = new Function(`return {${v}}`)();
+        console.log('virtualTargetRect', virtualTargetRect);
+
+        if (virtualTargetRect.x === 'mouseX') {
+            document.addEventListener('mousemove', virtualMouseMoveHandler);
+        } else {
+            document.removeEventListener('mousemove', virtualMouseMoveHandler);
+            updateVirtualTarget();
+            update();
+        }
+
+    };
+
+    const $targetRect = document.querySelector('.target-rect');
+    $targetRect.addEventListener('change', (e) => {
+        virtualTargetHandler(e.target.value);
+    });
+
+    // ===========================================================================================
+    
+    // bind
+    const controls = [
+        'popover-border-color',
+        'popover-bg-color',
+        'popover-color',
+        'popover-width',
+        'popover-height',
+        'container-width',
+        'container-height',
+        'target-width',
+        'target-height'
+    ];
+    controls.forEach((id) => {
+        const $elem = document.querySelector(`.${id}`);
+
+        const doms = {
+            popover: $popover,
+            container: $container,
+            target: $target
+        };
+
+        const $dom = doms[id.split('-').shift()];
+
+        const value = localStorage.getItem(id);
+        if (value) {
+            $elem.value = value;
+            $dom.style.setProperty(`--${id}`, value);
+
+        }
+
         $elem.addEventListener('change', (e) => {
-            popoverHandler();
+
+            const v = e.target.value;
+            localStorage.setItem(id, v);
+            $dom.style.setProperty(`--${id}`, v);
+
+            update();
         });
     });
 
     // ===========================================================================================
 
     const randomPosition = () => {
-        $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
-        $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
+
+        $target.style.left = `${Math.round(Math.random() * ($container.offsetWidth - $target.offsetWidth))}px`;
+        $target.style.top = `${Math.round(Math.random() * ($container.offsetHeight - $target.offsetHeight))}px`;
     };
 
     update();

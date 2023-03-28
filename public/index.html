@@ -233,8 +233,7 @@ body {
 
         const style = getPositionStyle(positionInfo, {
             bgColor: $popover.style.getPropertyValue('--popover-bg-color'),
-            borderColor: $popover.style.getPropertyValue('--popover-border-color'),
-            borderWidth: 1
+            borderColor: $popover.style.getPropertyValue('--popover-border-color')
         });
 
         // console.log(style);
@@ -350,6 +349,7 @@ body {
         if (virtualTargetRect.x === 'mouseX') {
             document.addEventListener('mousemove', virtualMouseMoveHandler);
         } else {
+            document.removeEventListener('mousemove', virtualMouseMoveHandler);
             updateVirtualTarget();
             update();
         }
