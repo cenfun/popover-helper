@@ -406,8 +406,9 @@ body {
     // ===========================================================================================
 
     const randomPosition = () => {
-        $target.style.left = `${Math.round(Math.random() * (800 - 120))}px`;
-        $target.style.top = `${Math.round(Math.random() * (600 - 30))}px`;
+
+        $target.style.left = `${Math.round(Math.random() * ($container.offsetWidth - $target.offsetWidth))}px`;
+        $target.style.top = `${Math.round(Math.random() * ($container.offsetHeight - $target.offsetHeight))}px`;
     };
 
     update();

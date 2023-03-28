@@ -152,13 +152,17 @@ const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeTy
 
     // both side passed, default to center
     if (space1 >= 0 && space2 >= 0) {
-        info.passed += 2;
+        if (info.passed) {
+            info.passed += 2;
+        }
         info.offset = popoverSize * 0.5;
         return;
     }
 
     // one side passed
-    info.passed += 1;
+    if (info.passed) {
+        info.passed += 1;
+    }
 
     if (space1 < 0) {
         info[alignType] = containerStart;
@@ -187,6 +191,8 @@ const calculateOffset = (info, containerRect, targetRect) => {
     // clamp offset
     info.offset = Math.min(Math.max(info.offset, 0), info[sizeType]);
 
+    info.left = Math.min(Math.max(info.left, containerRect.left), containerRect.left + containerRect.width - info.width);
+    info.top = Math.min(Math.max(info.top, containerRect.top), containerRect.top + containerRect.height - info.height);
 };
 
 // ===========================================================================================
@@ -195,8 +201,8 @@ const calculateChange = (info, previousInfo) => {
     if (!previousInfo) {
         return;
     }
-    // no change if type no change with previous
-    if (info.type === previousInfo.type) {
+    // no change if position no change with previous
+    if (info.position === previousInfo.position) {
         return;
     }
     const ax = info.left + info.width * 0.5;
@@ -259,7 +265,6 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
         withOrder = false;
     }
 
-    // console.log('typeList', typeList);
     // console.log('withOrder', withOrder);
 
     const infoList = allowPositions.map((p, i) => {
@@ -274,22 +279,37 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
         if (a.passed !== b.passed) {
             return b.passed - a.passed;
         }
-        if (previousInfo && a.passed >= safePassed) {
-            return a.change - b.change;
+
+        if (a.passed >= safePassed && b.passed >= safePassed) {
+            if (previousInfo) {
+                return a.change - b.change;
+            }
+            if (withOrder) {
+                return a.index - b.index;
+            }
         }
-        if (withOrder) {
-            return a.index - b.index;
-        }
+
         if (a.space !== b.space) {
             return b.space - a.space;
         }
+
         return a.index - b.index;
     });
 
-    // console.table(infoList, Object.keys(infoList[0]).filter((k) => !['type', 'width', 'height'].includes(k)));
+    // logTable(infoList);
 
     return infoList[0];
 };
+
+// const logTable = (() => {
+//     let time_id;
+//     return (info) => {
+//         clearTimeout(time_id);
+//         time_id = setTimeout(() => {
+//             console.table(info);
+//         }, 10);
+//     };
+// })();
 
 const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) => {
     const p = (px, py) => {
