@@ -3,6 +3,7 @@
     "version": "2.0.0",
     "description": "popover-helper",
     "main": "dist/popover-helper.js",
+    "module": "dist/popover-helper.esm.js",
     "scripts": {
         "build": "sf lint && sf b -p",
         "patch": "npm run build && sf publish patch",
