@@ -5,92 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="icon" href="data:,">
     <title>popover-helper</title>
-    <style>
-html,
-body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    user-select: none;
-}
-
-.container {
-    --container-width: 800px;
-    --container-height: 600px;
-
-    position: relative;
-    width: var(--container-width);
-    height: var(--container-height);
-    margin: 50px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    background-color: #f5f5f5;
-}
-
-.container::before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    content: "container";
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-}
-
-.target {
-    --target-width: 120px;
-    --target-height: 30px;
-
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: var(--target-width);
-    height: var(--target-height);
-    box-sizing: border-box;
-    color: #fff;
-    font-size: 12px;
-    line-height: 30px;
-    text-align: center;
-    border-radius: 3px;
-    background-color: green;
-    cursor: move;
-}
-
-.virtual-target {
-    position: absolute;
-    border: 1px dashed red;
-    pointer-events: none;
-}
-
-.toolbar {
-    margin: 50px;
-}
-
-.toolbar > * {
-    margin-bottom: 5px;
-}
-
-.popover {
-    --popover-color: #000;
-    --popover-width: 300px;
-    --popover-height: 200px;
-
-    position: absolute;
-    width: var(--popover-width);
-    height: var(--popover-height);
-    box-sizing: border-box;
-    color: var(--popover-color);
-    filter: drop-shadow(1px 2px 2px rgb(0 0 0 / 20%));
-}
-
-.popover-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-    </style>
+    <link href="./style.css" rel="stylesheet" />
     <!--inject:start-->
     <script src="dist/popover-helper.js?v=2.0.0"></script>
     <!--inject:end-->
@@ -100,7 +15,14 @@ body {
         <div class="target">target (move me)</div>
     </div>
     <div class="popover">
-        <div class="popover-content">popover</div>
+        <div class="popover-content">popover content popover content popover content 
+            popover content popover content popover content 
+            popover content popover content popover content 
+            popover content popover content popover content 
+            popover content popover content popover content 
+            popover content popover content popover content 
+            popover content popover content popover content 
+        </div>
     </div>
 
     <div class="toolbar">
@@ -281,6 +203,7 @@ body {
     updateTarget();
 
     const mousemoveHandler = (e) => {
+        e.preventDefault();
         const x = e.pageX - moveInfo.mx + moveInfo.tx;
         const y = e.pageY - moveInfo.my + moveInfo.ty;
         // console.log(x, y);
@@ -406,9 +329,9 @@ body {
     // ===========================================================================================
 
     const randomPosition = () => {
-
-        $target.style.left = `${Math.round(Math.random() * ($container.offsetWidth - $target.offsetWidth))}px`;
-        $target.style.top = `${Math.round(Math.random() * ($container.offsetHeight - $target.offsetHeight))}px`;
+        const x = Math.round(Math.random() * ($container.offsetWidth - $target.offsetWidth));
+        const y = Math.round(Math.random() * ($container.offsetHeight - $target.offsetHeight));
+        updateTarget(x, y);
     };
 
     update();

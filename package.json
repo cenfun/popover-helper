@@ -9,7 +9,7 @@
         "pack": "sf pack -o docs -q v={version}"
     },
     "files": [
-        "src"
+        "dist"
     ],
     "license": "MIT",
     "repository": {

@@ -446,7 +446,9 @@ export const getPositionStyle = (info, options = {}) => {
     // console.log(svg);
 
     const background = `no-repeat center url("data:image/svg+xml;charset=utf8,${encodeURIComponent(svg)}")`;
-    const padding = ['bottom', 'left', 'top', 'right'].map((k) => (info.position === k ? `${o.arrowSize}px` : 0)).join(' ');
+    const normalPadding = `${o.borderRadius}px`;
+    const arrowPadding = `${o.arrowSize + o.borderRadius}px`;
+    const padding = ['bottom', 'left', 'top', 'right'].map((k) => (info.position === k ? arrowPadding : normalPadding)).join(' ');
 
     return {
         background,
