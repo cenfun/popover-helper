@@ -7,10 +7,24 @@
     <title>popover-helper</title>
     <link href="./style.css" rel="stylesheet" />
     <!--inject:start-->
-    <script src="dist/popover-helper.js?v=2.0.0"></script>
+    <script src="dist/popover-helper.js?v=2.0.1"></script>
     <!--inject:end-->
 </head>
 <body>
+    <h3>popover settings:</h3>
+    <div>
+        border color:
+        <input type="text" value="#ccc" class="popover-border-color" />
+        bg color:
+        <input type="text" value="#fff" class="popover-bg-color" />
+        color:
+        <input type="text" value="#000" class="popover-color" />
+    </div>
+    <div>
+        positions: 
+        <span class="positions"></span>
+    </div>
+
     <div class="container">
         <div class="target">target (move me)</div>
     </div>
@@ -25,56 +39,42 @@
         </div>
     </div>
 
-    <div class="toolbar">
-        <div>
-            <button class="random">random target</button>
-        </div>
-        <h3>popover settings:</h3>
-        <div>
-            border color:
-            <input type="text" value="#ccc" class="popover-border-color" />
-            bg color:
-            <input type="text" value="#fff" class="popover-bg-color" />
-            color:
-            <input type="text" value="#000" class="popover-color" />
-        </div>
-        <div>
-            positions: 
-            <span class="positions"></span>
-        </div>
-
-        <h3>size settings:</h3>
-        <div>
-            popover width/height:
-            <input type="text" value="300px" class="popover-width" size="10" />
-            x
-            <input type="text" value="200px" class="popover-height" size="10" />
-        </div>
-        <div>
-            container width/height:
-            <input type="text" value="800px" class="container-width" size="10" />
-            x
-            <input type="text" value="600px" class="container-height" size="10" />
-        </div>
-        <div>
-            target width/height:
-            <input type="text" value="120px" class="target-width" size="10" />
-            x
-            <input type="text" value="30px" class="target-height" size="10" />
-        </div>
-        <div>
-            target rect:
-            <select class="target-rect">
-                <option></option>
-                <option>x: 100, y: 100, width: 0, height: 0</option>
-                <option>x: 100, y: 100, width: 100, height: 30</option>
-                <option>x: 200, y: 100, width: 200, height: 100</option>
-                <option>x: "mouseX", y: "mouseY", width: 0, height: 0</option>
-                <option>x: "mouseX", y: "mouseY", width: 100, height: 30</option>
-                <option>x: "mouseX", y: "mouseY", width: 200, height: 100</option>
-            </select>
-        </div>
+    <div>
+        <button class="random">random target</button>
     </div>
+
+    <h3>size settings:</h3>
+    <div>
+        popover width/height:
+        <input type="text" value="300px" class="popover-width" size="10" />
+        x
+        <input type="text" value="200px" class="popover-height" size="10" />
+    </div>
+    <div>
+        container width/height:
+        <input type="text" value="800px" class="container-width" size="10" />
+        x
+        <input type="text" value="600px" class="container-height" size="10" />
+    </div>
+    <div>
+        target width/height:
+        <input type="text" value="120px" class="target-width" size="10" />
+        x
+        <input type="text" value="30px" class="target-height" size="10" />
+    </div>
+    <div>
+        target rect:
+        <select class="target-rect">
+            <option></option>
+            <option>x: 100, y: 100, width: 0, height: 0</option>
+            <option>x: 100, y: 100, width: 100, height: 30</option>
+            <option>x: 200, y: 100, width: 200, height: 100</option>
+            <option>x: "mouseX", y: "mouseY", width: 0, height: 0</option>
+            <option>x: "mouseX", y: "mouseY", width: 100, height: 30</option>
+            <option>x: "mouseX", y: "mouseY", width: 200, height: 100</option>
+        </select>
+    </div>
+
 
    <script>
     const {
@@ -164,8 +164,7 @@
         $popover.style.left = `${positionInfo.left}px`;
         $popover.style.top = `${positionInfo.top}px`;
         $popover.style.background = style.background;
-        $popover.style.padding = style.padding;
-
+        // $popover.style.padding = style.padding;
     };
 
     // let time_id;
