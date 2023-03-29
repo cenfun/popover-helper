@@ -15,7 +15,8 @@
         "pack": "sf pack -o docs -q v={version}"
     },
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "license": "MIT",
     "repository": {
