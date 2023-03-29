@@ -451,7 +451,7 @@ export const getPositionStyle = (info, options = {}) => {
     const o = {
         bgColor: '#fff',
         borderColor: '#ccc',
-        borderRadius: 10,
+        borderRadius: 5,
         arrowSize: 10
     };
     Object.keys(options).forEach((k) => {
