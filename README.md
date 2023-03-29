@@ -41,8 +41,6 @@ const update = () => {
     $popover.style.left = `${positionInfo.left}px`;
     $popover.style.top = `${positionInfo.top}px`;
     $popover.style.background = style.background;
-    $popover.style.padding = style.padding;
-
 };
 
 update();

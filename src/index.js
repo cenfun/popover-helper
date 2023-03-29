@@ -9,6 +9,10 @@ const toNum = (num) => {
     return num;
 };
 
+const clamp = function(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+};
+
 const isWindow = (obj) => {
     return Boolean(obj && obj === obj.window);
 };
@@ -91,26 +95,26 @@ const calculators = {
 
     bottom: (info, containerRect, targetRect) => {
         info.space = containerRect.top + containerRect.height - targetRect.top - targetRect.height - info.height;
-        info.top = Math.max(targetRect.top + targetRect.height, containerRect.top);
+        info.top = targetRect.top + targetRect.height;
         info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
     },
 
     top: (info, containerRect, targetRect) => {
         info.space = targetRect.top - info.height - containerRect.top;
-        info.top = Math.min(targetRect.top - info.height, containerRect.top + containerRect.height - info.height);
+        info.top = targetRect.top - info.height;
         info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
     },
 
     right: (info, containerRect, targetRect) => {
         info.space = containerRect.left + containerRect.width - targetRect.left - targetRect.width - info.width;
         info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
-        info.left = Math.max(targetRect.left + targetRect.width, containerRect.left);
+        info.left = targetRect.left + targetRect.width;
     },
 
     left: (info, containerRect, targetRect) => {
         info.space = targetRect.left - info.width - containerRect.left;
         info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
-        info.left = Math.min(targetRect.left - info.width, containerRect.left + containerRect.width - info.width);
+        info.left = targetRect.left - info.width;
     }
 };
 
@@ -180,19 +184,22 @@ const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeTy
 
 };
 
+const calculateHV = (info, containerRect) => {
+    if (['top', 'bottom'].includes(info.position)) {
+        info.top = clamp(info.top, containerRect.top, containerRect.top + containerRect.height - info.height);
+        return ['left', 'width'];
+    }
+    info.left = clamp(info.left, containerRect.left, containerRect.left + containerRect.width - info.width);
+    return ['top', 'height'];
+};
+
 const calculateOffset = (info, containerRect, targetRect) => {
 
-    let alignType = 'top';
-    let sizeType = 'height';
-    if (['top', 'bottom'].includes(info.position)) {
-        alignType = 'left';
-        sizeType = 'width';
-    }
+    const [alignType, sizeType] = calculateHV(info, containerRect);
 
     calculateAlignOffset(info, containerRect, targetRect, alignType, sizeType);
 
-    // clamp offset
-    info.offset = Math.min(Math.max(info.offset, 0), info[sizeType]);
+    info.offset = clamp(info.offset, 0, info[sizeType]);
 
 };
 
@@ -299,20 +306,20 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
         return a.index - b.index;
     });
 
-    logTable(infoList);
+    // logTable(infoList);
 
     return infoList[0];
 };
 
-const logTable = (() => {
-    let time_id;
-    return (info) => {
-        clearTimeout(time_id);
-        time_id = setTimeout(() => {
-            console.table(info);
-        }, 10);
-    };
-})();
+// const logTable = (() => {
+//     let time_id;
+//     return (info) => {
+//         clearTimeout(time_id);
+//         time_id = setTimeout(() => {
+//             console.table(info);
+//         }, 10);
+//     };
+// })();
 
 const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) => {
     const p = (px, py) => {
@@ -333,43 +340,58 @@ const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) =>
     };
 
     const ls = [];
-    const startPoint = p(px(0), arrowSize + borderRadius);
+
+    const innerLeft = px(arrowSize);
+    const innerRight = pxe(width - arrowSize);
+    arrowOffset = clamp(arrowOffset, innerLeft, innerRight);
+
+    const innerTop = px(arrowSize);
+    const innerBottom = pxe(height - arrowSize);
+
+    const startPoint = p(innerLeft, innerTop + borderRadius);
+    const arrowPoint = p(arrowOffset, 1);
+
+    const LT = p(innerLeft, innerTop);
+    const RT = p(innerRight, innerTop);
+
+    const AOT = p(arrowOffset - arrowSize, innerTop);
+    const RRT = p(innerRight - borderRadius, innerTop);
 
     ls.push(`M${startPoint}`);
-    ls.push(`V${height - borderRadius}`);
-    ls.push(`Q${p(px(0), pxe(height))} ${p(borderRadius, pxe(height))}`);
-    ls.push(`H${width - borderRadius}`);
-    ls.push(`Q${p(pxe(width), pxe(height))} ${p(pxe(width), height - borderRadius)}`);
-    ls.push(`V${arrowSize + borderRadius}`);
+    ls.push(`V${innerBottom - borderRadius}`);
+    ls.push(`Q${p(innerLeft, innerBottom)} ${p(innerLeft + borderRadius, innerBottom)}`);
+    ls.push(`H${innerRight - borderRadius}`);
+    ls.push(`Q${p(innerRight, innerBottom)} ${p(innerRight, innerBottom - borderRadius)}`);
+    ls.push(`V${innerTop + borderRadius}`);
 
-    if (arrowOffset < arrowSize + borderRadius) {
-        ls.push(`Q${p(pxe(width), px(arrowSize))} ${p(width - borderRadius, px(arrowSize))}`);
+    if (arrowOffset < innerLeft + arrowSize + borderRadius) {
+        ls.push(`Q${RT} ${RRT}`);
         ls.push(`H${arrowOffset + arrowSize}`);
-        ls.push(`L${p(px(arrowOffset), 1)}`);
-        if (arrowOffset < arrowSize + 1) {
-            ls.push(`L${p(px(0), arrowSize)}`);
+        ls.push(`L${arrowPoint}`);
+        if (arrowOffset < innerLeft + arrowSize) {
+            ls.push(`L${LT}`);
             ls.push(`L${startPoint}`);
         } else {
-            ls.push(`L${p(arrowOffset - arrowSize, px(arrowSize))}`);
-            ls.push(`Q${p(px(0), px(arrowSize))} ${startPoint}`);
+            ls.push(`L${AOT}`);
+            ls.push(`Q${LT} ${startPoint}`);
         }
-    } else if (arrowOffset > width - arrowSize - borderRadius) {
-        if (arrowOffset > width - arrowSize - 1) {
-            ls.push(`L${p(pxe(width), px(arrowSize))}`);
+    } else if (arrowOffset > innerRight - arrowSize - borderRadius) {
+        if (arrowOffset > innerRight - arrowSize) {
+            ls.push(`L${RT}`);
         } else {
-            ls.push(`Q${p(pxe(width), px(arrowSize))} ${p(px(arrowOffset + arrowSize), arrowSize)}`);
+            ls.push(`Q${RT} ${p(arrowOffset + arrowSize, innerTop)}`);
         }
-        ls.push(`L${p(pxe(arrowOffset), 1)}`);
-        ls.push(`L${p(arrowOffset - arrowSize, px(arrowSize))}`);
-        ls.push(`H${p(borderRadius, px(arrowSize))}`);
-        ls.push(`Q${p(px(0), px(arrowSize))} ${startPoint}`);
+        ls.push(`L${arrowPoint}`);
+        ls.push(`L${AOT}`);
+        ls.push(`H${innerLeft + borderRadius}`);
+        ls.push(`Q${LT} ${startPoint}`);
     } else {
-        ls.push(`Q${p(pxe(width), px(arrowSize))} ${p(width - borderRadius, px(arrowSize))}`);
+        ls.push(`Q${RT} ${RRT}`);
         ls.push(`H${arrowOffset + arrowSize}`);
-        ls.push(`L${p(arrowOffset, 1)}`);
-        ls.push(`L${p(arrowOffset - arrowSize, px(arrowSize))}`);
-        ls.push(`H${borderRadius}`);
-        ls.push(`Q${p(px(0), px(arrowSize))} ${startPoint}`);
+        ls.push(`L${arrowPoint}`);
+        ls.push(`L${AOT}`);
+        ls.push(`H${innerLeft + borderRadius}`);
+        ls.push(`Q${LT} ${startPoint}`);
     }
     return ls.join('');
 };
@@ -418,7 +440,12 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
     return handlers[position]();
 };
 
-// bindResize
+// cache one last result
+const styleCache = {
+    key: '',
+    value: ''
+};
+
 export const getPositionStyle = (info, options = {}) => {
 
     const o = {
@@ -433,6 +460,21 @@ export const getPositionStyle = (info, options = {}) => {
             o[k] = v;
         }
     });
+
+    const key = [
+        info.position,
+        info.width,
+        info.height,
+        info.offset,
+        o.arrowSize,
+        o.borderRadius,
+        o.bgColor,
+        o.borderColor
+    ].join('-');
+
+    if (key === styleCache.key) {
+        return styleCache.value;
+    }
 
     // console.log(options);
 
@@ -449,12 +491,16 @@ export const getPositionStyle = (info, options = {}) => {
     // console.log(svg);
 
     const background = `no-repeat center url("data:image/svg+xml;charset=utf8,${encodeURIComponent(svg)}")`;
-    const normalPadding = `${o.borderRadius}px`;
-    const arrowPadding = `${o.arrowSize + o.borderRadius}px`;
-    const padding = ['bottom', 'left', 'top', 'right'].map((k) => (info.position === k ? arrowPadding : normalPadding)).join(' ');
 
-    return {
+    const padding = `${o.arrowSize + o.borderRadius}px`;
+
+    const style = {
         background,
         padding
     };
+
+    styleCache.key = key;
+    styleCache.value = style;
+
+    return style;
 };

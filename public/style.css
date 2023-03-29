@@ -60,6 +60,7 @@ body {
     width: var(--popover-width);
     height: var(--popover-height);
     margin: 0;
+    padding: 20px;
     box-sizing: border-box;
     color: var(--popover-color);
     border: none;
