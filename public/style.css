@@ -1,9 +1,5 @@
-html,
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    padding: 50px;
     overflow: hidden;
 }
 
@@ -14,8 +10,9 @@ body {
     position: relative;
     width: var(--container-width);
     height: var(--container-height);
-    margin: 50px;
+    margin: 50px auto;
     box-sizing: border-box;
+    text-align: center;
     border: 1px solid #ccc;
     background-color: #f5f5f5;
 }
@@ -52,14 +49,6 @@ body {
     position: absolute;
     border: 1px dashed red;
     pointer-events: none;
-}
-
-.toolbar {
-    margin: 50px;
-}
-
-.toolbar > * {
-    margin-bottom: 5px;
 }
 
 .popover {

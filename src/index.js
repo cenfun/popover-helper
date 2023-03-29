@@ -91,26 +91,26 @@ const calculators = {
 
     bottom: (info, containerRect, targetRect) => {
         info.space = containerRect.top + containerRect.height - targetRect.top - targetRect.height - info.height;
-        info.top = targetRect.top + targetRect.height;
+        info.top = Math.max(targetRect.top + targetRect.height, containerRect.top);
         info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
     },
 
     top: (info, containerRect, targetRect) => {
         info.space = targetRect.top - info.height - containerRect.top;
-        info.top = targetRect.top - info.height;
+        info.top = Math.min(targetRect.top - info.height, containerRect.top + containerRect.height - info.height);
         info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
     },
 
     right: (info, containerRect, targetRect) => {
         info.space = containerRect.left + containerRect.width - targetRect.left - targetRect.width - info.width;
         info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
-        info.left = targetRect.left + targetRect.width;
+        info.left = Math.max(targetRect.left + targetRect.width, containerRect.left);
     },
 
     left: (info, containerRect, targetRect) => {
         info.space = targetRect.left - info.width - containerRect.left;
         info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
-        info.left = targetRect.left - info.width;
+        info.left = Math.min(targetRect.left - info.width, containerRect.left + containerRect.width - info.width);
     }
 };
 
@@ -139,11 +139,13 @@ const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeTy
     const targetStart = targetRect[alignType];
     const targetSize = targetRect[sizeType];
 
+    const targetCenter = targetStart + targetSize * 0.5;
+
     // size overflow
     if (popoverSize > containerSize) {
         const overflow = (popoverSize - containerSize) * 0.5;
         info[alignType] = containerStart - overflow;
-        info.offset = targetStart + targetSize * 0.5 - containerStart + overflow;
+        info.offset = targetCenter - containerStart + overflow;
         return;
     }
 
@@ -165,15 +167,16 @@ const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeTy
     }
 
     if (space1 < 0) {
-        info[alignType] = containerStart;
-        info.offset = targetStart + targetSize * 0.5 - containerStart;
+        const min = containerStart;
+        info[alignType] = min;
+        info.offset = targetCenter - min;
         return;
     }
 
     // space2 < 0
-    const start = containerStart + containerSize - popoverSize;
-    info[alignType] = start;
-    info.offset = targetStart + targetSize * 0.5 - start;
+    const max = containerStart + containerSize - popoverSize;
+    info[alignType] = max;
+    info.offset = targetCenter - max;
 
 };
 
@@ -191,8 +194,6 @@ const calculateOffset = (info, containerRect, targetRect) => {
     // clamp offset
     info.offset = Math.min(Math.max(info.offset, 0), info[sizeType]);
 
-    info.left = Math.min(Math.max(info.left, containerRect.left), containerRect.left + containerRect.width - info.width);
-    info.top = Math.min(Math.max(info.top, containerRect.top), containerRect.top + containerRect.height - info.height);
 };
 
 // ===========================================================================================
@@ -213,6 +214,8 @@ const calculateChange = (info, previousInfo) => {
     const dy = Math.abs(ay - by);
     info.change = Math.round(Math.sqrt(dx * dx + dy * dy));
 };
+
+// ===========================================================================================
 
 const calculatePositionInfo = (position, index, containerRect, targetRect, popoverRect, previousInfo) => {
     const info = {
@@ -296,20 +299,20 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
         return a.index - b.index;
     });
 
-    // logTable(infoList);
+    logTable(infoList);
 
     return infoList[0];
 };
 
-// const logTable = (() => {
-//     let time_id;
-//     return (info) => {
-//         clearTimeout(time_id);
-//         time_id = setTimeout(() => {
-//             console.table(info);
-//         }, 10);
-//     };
-// })();
+const logTable = (() => {
+    let time_id;
+    return (info) => {
+        clearTimeout(time_id);
+        time_id = setTimeout(() => {
+            console.table(info);
+        }, 10);
+    };
+})();
 
 const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) => {
     const p = (px, py) => {
