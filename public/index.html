@@ -115,7 +115,7 @@
                 positions.push(elem.value);
             }
         });
-        console.log(positions);
+        // console.log(positions);
         localStorage.setItem('popover-positions', positions.join(','));
     };
     updatePositions();
@@ -135,14 +135,27 @@
 
     let virtualTargetRect;
 
+    // const log = (name, time) => {
+    //     if (time > 0.5) {
+    //         console.log(name, time);
+    //     }
+    // };
+
     const update = () => {
+
+        const bgColor = $popover.style.getPropertyValue('--popover-bg-color');
+        const borderColor = $popover.style.getPropertyValue('--popover-border-color');
+
+        // let start_time = performance.now();
+
         // get 3 rect for calculation
         const containerRect = getRect('.container');
         const targetRect = getRect(virtualTargetRect || '.target');
-        // console.log('targetRect', targetRect);
-
         const popoverRect = getRect('.popover');
 
+        // log('get rect', performance.now() - start_time);
+        // start_time = performance.now();
+    
         // console.log(positions);
 
         positionInfo = getBestPosition(
@@ -155,18 +168,30 @@
             positionInfo
         );
 
-        // console.log(positionInfo);
-        $popover.style.left = `${positionInfo.left}px`;
-        $popover.style.top = `${positionInfo.top}px`;
+        // log('getBestPosition', performance.now() - start_time);
+        // start_time = performance.now();
 
+        // console.log(positionInfo.changed);
+        if (positionInfo.changed) {
+            $popover.style.left = `${positionInfo.left}px`;
+            $popover.style.top = `${positionInfo.top}px`;
+            // log('style top/left', performance.now() - start_time);
+            // start_time = performance.now();
+        }
+    
         const style = getPositionStyle(positionInfo, {
-            bgColor: $popover.style.getPropertyValue('--popover-bg-color'),
-            borderColor: $popover.style.getPropertyValue('--popover-border-color')
+            bgColor,
+            borderColor
         });
+
+        // log('getPositionStyle', performance.now() - start_time);
+        // start_time = performance.now();
+
         // console.log(style.changed);
         // performance optimized
         if (style.changed) {
             $popover.style.background = style.background;
+            // log('background', performance.now() - start_time);
         }
     };
 
@@ -306,7 +331,6 @@
         if (value) {
             $elem.value = value;
             $dom.style.setProperty(`--${id}`, value);
-
         }
 
         $elem.addEventListener('change', (e) => {

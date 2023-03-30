@@ -25,6 +25,8 @@ const isElement = (obj) => {
     return Boolean(obj && obj.nodeType === 1);
 };
 
+// ===========================================================================================
+
 export const toRect = (obj) => {
     if (obj) {
         return {
@@ -118,6 +120,7 @@ const calculators = {
     }
 };
 
+// with order
 export const getDefaultPositions = () => {
     return Object.keys(calculators);
 };
@@ -205,50 +208,93 @@ const calculateOffset = (info, containerRect, targetRect) => {
 
 // ===========================================================================================
 
-const calculateChange = (info, previousInfo) => {
-    if (!previousInfo) {
+const calculateDistance = (info, previousPositionInfo) => {
+    if (!previousPositionInfo) {
         return;
     }
     // no change if position no change with previous
-    if (info.position === previousInfo.position) {
+    if (info.position === previousPositionInfo.position) {
         return;
     }
     const ax = info.left + info.width * 0.5;
     const ay = info.top + info.height * 0.5;
-    const bx = previousInfo.left + previousInfo.width * 0.5;
-    const by = previousInfo.top + previousInfo.height * 0.5;
+    const bx = previousPositionInfo.left + previousPositionInfo.width * 0.5;
+    const by = previousPositionInfo.top + previousPositionInfo.height * 0.5;
     const dx = Math.abs(ax - bx);
     const dy = Math.abs(ay - by);
-    info.change = Math.round(Math.sqrt(dx * dx + dy * dy));
+    info.distance = Math.round(Math.sqrt(dx * dx + dy * dy));
 };
 
 // ===========================================================================================
 
-const calculatePositionInfo = (position, index, containerRect, targetRect, popoverRect, previousInfo) => {
-    const info = {
-        position,
-        index,
-
-        top: 0,
-        left: 0,
-        width: popoverRect.width,
-        height: popoverRect.height,
-
-        space: 0,
-
-        offset: 0,
-        passed: 0,
-
-        change: 0
-    };
-
-
+const calculatePositionInfo = (info, containerRect, targetRect, previousPositionInfo) => {
     calculateSpace(info, containerRect, targetRect);
     calculateOffset(info, containerRect, targetRect);
-    calculateChange(info, previousInfo);
-
-    return info;
+    calculateDistance(info, previousPositionInfo);
 };
+
+// ===========================================================================================
+
+const calculateBestPosition = (containerRect, targetRect, infoMap, withOrder, previousPositionInfo) => {
+
+    // position space: +1
+    // align space:
+    //    two side passed: +2
+    //    one side passed: +1
+
+    const safePassed = 3;
+
+    if (previousPositionInfo) {
+        const prevInfo = infoMap[previousPositionInfo.position];
+        if (prevInfo) {
+            calculatePositionInfo(prevInfo, containerRect, targetRect);
+            if (prevInfo.passed >= safePassed) {
+                return prevInfo;
+            }
+            prevInfo.calculated = true;
+        }
+    }
+
+    const positionList = [];
+    Object.values(infoMap).forEach((info) => {
+        if (!info.calculated) {
+            calculatePositionInfo(info, containerRect, targetRect, previousPositionInfo);
+        }
+        positionList.push(info);
+    });
+
+    positionList.sort((a, b) => {
+        if (a.passed !== b.passed) {
+            return b.passed - a.passed;
+        }
+
+        if (withOrder && a.passed >= safePassed && b.passed >= safePassed) {
+            return a.index - b.index;
+        }
+
+        if (a.space !== b.space) {
+            return b.space - a.space;
+        }
+
+        return a.index - b.index;
+    });
+
+    // logTable(positionList);
+
+    return positionList[0];
+};
+
+// const logTable = (() => {
+//     let time_id;
+//     return (info) => {
+//         clearTimeout(time_id);
+//         time_id = setTimeout(() => {
+//             console.table(info);
+//         }, 10);
+//     };
+// })();
+
+// ===========================================================================================
 
 const getAllowPositions = (positions, defaultAllowPositions) => {
     if (!positions) {
@@ -265,7 +311,31 @@ const getAllowPositions = (positions, defaultAllowPositions) => {
     return positions;
 };
 
-export const getBestPosition = (containerRect, targetRect, popoverRect, positions, previousInfo) => {
+const isPositionChanged = (info, previousPositionInfo) => {
+    if (!previousPositionInfo) {
+        return true;
+    }
+
+    if (info.left !== previousPositionInfo.left) {
+        return true;
+    }
+
+    if (info.top !== previousPositionInfo.top) {
+        return true;
+    }
+
+    return false;
+};
+
+// ===========================================================================================
+
+// const log = (name, time) => {
+//     if (time > 0.1) {
+//         console.log(name, time);
+//     }
+// };
+
+export const getBestPosition = (containerRect, targetRect, popoverRect, positions, previousPositionInfo) => {
 
     const defaultAllowPositions = getDefaultPositions();
     let withOrder = true;
@@ -277,49 +347,40 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
 
     // console.log('withOrder', withOrder);
 
-    const infoList = allowPositions.map((p, i) => {
-        return calculatePositionInfo(p, i, containerRect, targetRect, popoverRect, previousInfo);
+    // const start_time = performance.now();
+
+    const infoMap = {};
+    allowPositions.forEach((k, i) => {
+        infoMap[k] = {
+            position: k,
+            index: i,
+
+            top: 0,
+            left: 0,
+            width: popoverRect.width,
+            height: popoverRect.height,
+
+            space: 0,
+
+            offset: 0,
+            passed: 0,
+
+            distance: 0
+        };
     });
 
-    // 1, position space
-    // 2, align space
-    const safePassed = 2;
+    // log('infoMap', performance.now() - start_time);
 
-    infoList.sort((a, b) => {
-        if (a.passed !== b.passed) {
-            return b.passed - a.passed;
-        }
 
-        if (a.passed >= safePassed && b.passed >= safePassed) {
-            if (previousInfo) {
-                return a.change - b.change;
-            }
-            if (withOrder) {
-                return a.index - b.index;
-            }
-        }
+    const bestPosition = calculateBestPosition(containerRect, targetRect, infoMap, withOrder, previousPositionInfo);
 
-        if (a.space !== b.space) {
-            return b.space - a.space;
-        }
+    // check left/top
+    bestPosition.changed = isPositionChanged(bestPosition, previousPositionInfo);
 
-        return a.index - b.index;
-    });
-
-    // logTable(infoList);
-
-    return infoList[0];
+    return bestPosition;
 };
 
-// const logTable = (() => {
-//     let time_id;
-//     return (info) => {
-//         clearTimeout(time_id);
-//         time_id = setTimeout(() => {
-//             console.table(info);
-//         }, 10);
-//     };
-// })();
+// ===========================================================================================
 
 const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) => {
     const p = (px, py) => {
@@ -439,6 +500,8 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
 
     return handlers[position]();
 };
+
+// ===========================================================================================
 
 // position style cache
 const styleCache = {
