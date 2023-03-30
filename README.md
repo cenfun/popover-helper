@@ -32,8 +32,10 @@ const update = () => {
     );
 
     //console.log(positionInfo);
-    $popover.style.left = `${positionInfo.left}px`;
-    $popover.style.top = `${positionInfo.top}px`;
+    if (positionInfo.changed) {
+        $popover.style.left = `${positionInfo.left}px`;
+        $popover.style.top = `${positionInfo.top}px`;
+    }
 
     const style = getPositionStyle(positionInfo, {
         bgColor: "#fff",
@@ -51,6 +53,9 @@ update();
 see [/public/index.html](/public/index.html)
 
 ## CHANGELOG
+
+- 2.0.3
+    - fixed performance issue
 
 - 2.0.0
     - replaced css arrow with svg background
