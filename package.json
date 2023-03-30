@@ -1,11 +1,11 @@
 {
     "name": "popover-helper",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "popover-helper",
     "main": "dist/popover-helper.js",
-    "module": "dist/popover-helper.esm.js",
     "exports": {
         ".": {
+            "require": "./dist/popover-helper.js",
             "import": "./src/index.js"
         }
     },

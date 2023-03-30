@@ -1,5 +1,5 @@
-# popover-helper
-## Online Demo
+# Popover Helper
+## Preview
 [https://cenfun.github.io/popover-helper](https://cenfun.github.io/popover-helper)
 
 ## Install
@@ -32,15 +32,17 @@ const update = () => {
     );
 
     //console.log(positionInfo);
+    $popover.style.left = `${positionInfo.left}px`;
+    $popover.style.top = `${positionInfo.top}px`;
 
     const style = getPositionStyle(positionInfo, {
         bgColor: "#fff",
         borderColor: "#ccc"
     });
-
-    $popover.style.left = `${positionInfo.left}px`;
-    $popover.style.top = `${positionInfo.top}px`;
-    $popover.style.background = style.background;
+    // performance optimized
+    if (style.changed) {
+        $popover.style.background = style.background;
+    }
 };
 
 update();

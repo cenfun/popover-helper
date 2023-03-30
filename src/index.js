@@ -440,10 +440,13 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
     return handlers[position]();
 };
 
-// cache one last result
+// position style cache
 const styleCache = {
-    key: '',
-    value: ''
+    // position: '',
+    // top: {},
+    // bottom: {},
+    // left: {},
+    // right: {}
 };
 
 export const getPositionStyle = (info, options = {}) => {
@@ -462,7 +465,6 @@ export const getPositionStyle = (info, options = {}) => {
     });
 
     const key = [
-        info.position,
         info.width,
         info.height,
         info.offset,
@@ -472,8 +474,12 @@ export const getPositionStyle = (info, options = {}) => {
         o.borderColor
     ].join('-');
 
-    if (key === styleCache.key) {
-        return styleCache.value;
+    const positionCache = styleCache[info.position];
+    if (positionCache && key === positionCache.key) {
+        const st = positionCache.style;
+        st.changed = styleCache.position !== info.position;
+        styleCache.position = info.position;
+        return st;
     }
 
     // console.log(options);
@@ -497,11 +503,15 @@ export const getPositionStyle = (info, options = {}) => {
 
     const style = {
         background,
-        padding
+        padding,
+        changed: true
     };
 
-    styleCache.key = key;
-    styleCache.value = style;
+    styleCache.position = info.position;
+    styleCache[info.position] = {
+        key,
+        style
+    };
 
     return style;
 };

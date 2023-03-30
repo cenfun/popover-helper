@@ -20,11 +20,12 @@
         color:
         <input type="text" value="#000" class="popover-color" />
     </div>
+
     <div>
         positions: 
         <span class="positions"></span>
     </div>
-
+    
     <div class="container">
         <div class="target">target (move me)</div>
     </div>
@@ -75,6 +76,7 @@
         </select>
     </div>
 
+    <div class="fps-detector"></div>
 
    <script>
     const {
@@ -133,7 +135,7 @@
 
     let virtualTargetRect;
 
-    const updateSync = () => {
+    const update = () => {
         // get 3 rect for calculation
         const containerRect = getRect('.container');
         const targetRect = getRect(virtualTargetRect || '.target');
@@ -153,28 +155,20 @@
             positionInfo
         );
 
+        // console.log(positionInfo);
+        $popover.style.left = `${positionInfo.left}px`;
+        $popover.style.top = `${positionInfo.top}px`;
+
         const style = getPositionStyle(positionInfo, {
             bgColor: $popover.style.getPropertyValue('--popover-bg-color'),
             borderColor: $popover.style.getPropertyValue('--popover-border-color')
         });
-
-        // console.log(style);
-
-        // console.log(positionInfo);
-        $popover.style.left = `${positionInfo.left}px`;
-        $popover.style.top = `${positionInfo.top}px`;
-        $popover.style.background = style.background;
-        // $popover.style.padding = style.padding;
+        // console.log(style.changed);
+        // performance optimized
+        if (style.changed) {
+            $popover.style.background = style.background;
+        }
     };
-
-    // let time_id;
-    const update = () => {
-        // clearTimeout(time_id);
-        // time_id = setTimeout(() => {
-        updateSync();
-        // }, 10);
-    };
-
 
     // ===========================================================================================
     const moveInfo = {
@@ -339,7 +333,13 @@
         randomPosition();
         update();
     });
+
+    window.onload = () => {
+        const FPSDetector = window['fps-detector'].FPSDetector;
+        new FPSDetector('.fps-detector');
+    };
     
    </script>
+   <script src="https://cdn.jsdelivr.net/npm/fps-detector@latest/dist/fps-detector.js"></script>
 </body>
 </html>
