@@ -19,6 +19,8 @@
         <input type="text" value="#fff" class="popover-bg-color" />
         color:
         <input type="text" value="#000" class="popover-color" />
+        arrow size:
+        <input type="number" step="1" min="0" value="10" class="popover-arrow-size" />
     </div>
 
     <div>
@@ -145,6 +147,7 @@
 
         const bgColor = $popover.style.getPropertyValue('--popover-bg-color');
         const borderColor = $popover.style.getPropertyValue('--popover-border-color');
+        const arrowSize = $popover.style.getPropertyValue('--popover-arrow-size');
 
         // let start_time = performance.now();
 
@@ -181,7 +184,8 @@
     
         const style = getPositionStyle(positionInfo, {
             bgColor,
-            borderColor
+            borderColor,
+            arrowSize: parseInt(arrowSize)
         });
 
         // log('getPositionStyle', performance.now() - start_time);
@@ -309,6 +313,7 @@
         'popover-border-color',
         'popover-bg-color',
         'popover-color',
+        'popover-arrow-size',
         'popover-width',
         'popover-height',
         'container-width',

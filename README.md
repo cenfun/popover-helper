@@ -39,7 +39,8 @@ const update = () => {
 
     const style = getPositionStyle(positionInfo, {
         bgColor: "#fff",
-        borderColor: "#ccc"
+        borderColor: "#ccc",
+        arrowSize: 10
     });
     // performance optimized
     if (style.changed) {
@@ -53,6 +54,9 @@ update();
 see [/public/index.html](/public/index.html)
 
 ## CHANGELOG
+
+- 2.0.4
+    - fixed arrow size (#1)
 
 - 2.0.3
     - fixed performance issue

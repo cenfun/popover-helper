@@ -10,6 +10,7 @@
         }
     },
     "scripts": {
+        "dev": "sf d",
         "build": "sf lint && sf b -p",
         "patch": "npm run build && sf publish patch",
         "pack": "sf pack -o docs -q v={version}"
@@ -25,10 +26,9 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "eslint": "^8.37.0",
-        "eslint-config-plus": "^1.0.6",
-        "eslint-plugin-html": "^7.1.0",
-        "stylelint": "^15.3.0",
-        "stylelint-config-plus": "^1.0.2"
+        "eslint": "^9.16.0",
+        "eslint-config-plus": "^2.0.2",
+        "stylelint": "^16.11.0",
+        "stylelint-config-plus": "^1.1.3"
     }
 }

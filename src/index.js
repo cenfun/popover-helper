@@ -1,3 +1,23 @@
+const hasOwn = function(obj, key) {
+    return Object.prototype.hasOwnProperty.call(obj, key);
+};
+
+const isNum = function(num) {
+    if (typeof num !== 'number' || isNaN(num)) {
+        return false;
+    }
+    const isInvalid = function(n) {
+        if (n === Number.MAX_VALUE || n === Number.MIN_VALUE || n === Number.NEGATIVE_INFINITY || n === Number.POSITIVE_INFINITY) {
+            return true;
+        }
+        return false;
+    };
+    if (isInvalid(num)) {
+        return false;
+    }
+    return true;
+};
+
 const toNum = (num) => {
     if (typeof (num) !== 'number') {
         num = parseFloat(num);
@@ -520,10 +540,25 @@ export const getPositionStyle = (info, options = {}) => {
         borderRadius: 5,
         arrowSize: 10
     };
-    Object.keys(options).forEach((k) => {
-        const v = options[k];
-        if (v) {
-            o[k] = v;
+    Object.keys(o).forEach((k) => {
+
+        if (hasOwn(options, k)) {
+            const d = o[k];
+            const v = options[k];
+
+            if (typeof d === 'string') {
+                // string
+                if (typeof v === 'string' && v) {
+                    o[k] = v;
+                }
+            } else {
+                // number
+                if (isNum(v) && v >= 0) {
+                    o[k] = v;
+                }
+
+            }
+
         }
     });
 
