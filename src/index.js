@@ -80,7 +80,7 @@ export const getElement = (selector) => {
     }
 };
 
-export const getRect = (target) => {
+export const getRect = (target, fixed) => {
     if (!target) {
         return toRect();
     }
@@ -103,8 +103,11 @@ export const getRect = (target) => {
     const rect = toRect(br);
 
     // fix offset
-    rect.left += window.pageXOffset;
-    rect.top += window.pageYOffset;
+    if (!fixed) {
+        rect.left += window.scrollX;
+        rect.top += window.scrollY;
+    }
+
     rect.width = elem.offsetWidth;
     rect.height = elem.offsetHeight;
 

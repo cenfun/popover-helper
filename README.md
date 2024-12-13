@@ -55,6 +55,9 @@ see [/public/index.html](/public/index.html)
 
 ## CHANGELOG
 
+- 2.0.5
+    - added argument `fixed` for `getRect(target, fixed)`
+
 - 2.0.4
     - fixed arrow size (#1)
 
