@@ -1,6 +1,6 @@
 {
     "name": "popover-helper",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "description": "popover-helper",
     "main": "dist/popover-helper.js",
     "exports": {
