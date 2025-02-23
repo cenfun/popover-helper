@@ -596,14 +596,15 @@ export const getPositionStyle = (info, options = {}) => {
     ].join('');
 
     // console.log(svg);
-    const url = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(svg)}")`;
+    const backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(svg)}")`;
 
-    const background = `${url} center no-repeat`;
+    const background = `${backgroundImage} center no-repeat`;
 
     const padding = `${o.arrowSize + o.borderRadius}px`;
 
     const style = {
         background,
+        backgroundImage,
         padding,
         changed: true
     };
