@@ -93,6 +93,8 @@
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
 
+    defaultPositions.push("align")
+
     defaultPositions.forEach((item) => {
         const label = document.createElement('label');
         const input = document.createElement('input');

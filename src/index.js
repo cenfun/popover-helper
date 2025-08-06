@@ -116,30 +116,50 @@ export const getRect = (target, fixed) => {
 
 // ===========================================================================================
 
+const calculateLeft = (info, targetRect) => {
+    if (info.align === 'start') {
+        info.left = Math.round(targetRect.left);
+    } else if (info.align === 'end') {
+        info.left = Math.round(targetRect.left + targetRect.width - info.width);
+    } else {
+        info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
+    }
+};
+
+const calculateTop = (info, targetRect) => {
+    if (info.align === 'start') {
+        info.top = Math.round(targetRect.top);
+    } else if (info.align === 'end') {
+        info.top = Math.round(targetRect.top + targetRect.height - info.height);
+    } else {
+        info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
+    }
+};
+
 const calculators = {
 
     bottom: (info, containerRect, targetRect) => {
         info.space = containerRect.top + containerRect.height - targetRect.top - targetRect.height - info.height;
         info.top = targetRect.top + targetRect.height;
-        info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
+        calculateLeft(info, targetRect);
     },
 
     top: (info, containerRect, targetRect) => {
         info.space = targetRect.top - info.height - containerRect.top;
         info.top = targetRect.top - info.height;
-        info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
+        calculateLeft(info, targetRect);
     },
 
     right: (info, containerRect, targetRect) => {
         info.space = containerRect.left + containerRect.width - targetRect.left - targetRect.width - info.width;
-        info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
         info.left = targetRect.left + targetRect.width;
+        calculateTop(info, targetRect);
     },
 
     left: (info, containerRect, targetRect) => {
         info.space = targetRect.left - info.width - containerRect.left;
-        info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
         info.left = targetRect.left - info.width;
+        calculateTop(info, targetRect);
     }
 };
 
@@ -258,7 +278,7 @@ const calculatePositionInfo = (info, containerRect, targetRect, previousPosition
 
 // ===========================================================================================
 
-const calculateBestPosition = (containerRect, targetRect, infoMap, withOrder, previousPositionInfo) => {
+const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, previousPositionInfo) => {
 
     // position space: +1
     // align space:
@@ -268,7 +288,7 @@ const calculateBestPosition = (containerRect, targetRect, infoMap, withOrder, pr
     const safePassed = 3;
 
     if (previousPositionInfo) {
-        const prevInfo = infoMap[previousPositionInfo.position];
+        const prevInfo = allowList.find((it) => it.position === previousPositionInfo.position && it.align === previousPositionInfo.align);
         if (prevInfo) {
             calculatePositionInfo(prevInfo, containerRect, targetRect);
             if (prevInfo.passed >= safePassed) {
@@ -279,7 +299,7 @@ const calculateBestPosition = (containerRect, targetRect, infoMap, withOrder, pr
     }
 
     const positionList = [];
-    Object.values(infoMap).forEach((info) => {
+    allowList.forEach((info) => {
         if (!info.calculated) {
             calculatePositionInfo(info, containerRect, targetRect, previousPositionInfo);
         }
@@ -319,21 +339,6 @@ const calculateBestPosition = (containerRect, targetRect, infoMap, withOrder, pr
 
 // ===========================================================================================
 
-const getAllowPositions = (positions, defaultAllowPositions) => {
-    if (!positions) {
-        return;
-    }
-    if (Array.isArray(positions)) {
-        positions = positions.join(',');
-    }
-    positions = String(positions).split(',').map((it) => it.trim().toLowerCase()).filter((it) => it);
-    positions = positions.filter((it) => defaultAllowPositions.includes(it));
-    if (!positions.length) {
-        return;
-    }
-    return positions;
-};
-
 const isPositionChanged = (info, previousPositionInfo) => {
     if (!previousPositionInfo) {
         return true;
@@ -361,21 +366,34 @@ const isPositionChanged = (info, previousPositionInfo) => {
 export const getBestPosition = (containerRect, targetRect, popoverRect, positions, previousPositionInfo) => {
 
     const defaultAllowPositions = getDefaultPositions();
-    let withOrder = true;
-    let allowPositions = getAllowPositions(positions, defaultAllowPositions);
-    if (!allowPositions) {
-        allowPositions = defaultAllowPositions;
-        withOrder = false;
+    let withAlign = false;
+    let withOrder = false;
+    let allowPositions = defaultAllowPositions;
+    if (positions) {
+        if (typeof positions !== 'string') {
+            positions = `${positions}`;
+        }
+        positions = positions.split(',').map((it) => it.trim().toLowerCase()).filter((it) => it);
+        if (positions.includes('align')) {
+            withAlign = true;
+        }
+        positions = positions.filter((it) => defaultAllowPositions.includes(it));
+        if (positions.length) {
+            withOrder = true;
+            allowPositions = positions;
+        }
     }
 
     // console.log('withOrder', withOrder);
+    // console.log('withAlign', withAlign);
 
     // const start_time = performance.now();
 
-    const infoMap = {};
+    const allowList = [];
     allowPositions.forEach((k, i) => {
-        infoMap[k] = {
+        const item = {
             position: k,
+            align: 'center',
             index: i,
 
             top: 0,
@@ -390,12 +408,23 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
 
             distance: 0
         };
+        if (withAlign) {
+            allowList.push({
+                ... item,
+                align: 'start'
+            });
+            allowList.push({
+                ... item,
+                align: 'end'
+            });
+        } else {
+            allowList.push(item);
+        }
     });
 
-    // log('infoMap', performance.now() - start_time);
+    // log('allowList', performance.now() - start_time);
 
-
-    const bestPosition = calculateBestPosition(containerRect, targetRect, infoMap, withOrder, previousPositionInfo);
+    const bestPosition = calculateBestPosition(containerRect, targetRect, allowList, withOrder, previousPositionInfo);
 
     // check left/top
     bestPosition.changed = isPositionChanged(bestPosition, previousPositionInfo);
