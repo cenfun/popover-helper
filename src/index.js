@@ -454,12 +454,12 @@ const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) =>
 
     const ls = [];
 
-    const innerLeft = px(arrowSize);
-    const innerRight = pxe(width - arrowSize);
+    const innerLeft = px(0);
+    const innerRight = pxe(width);
     arrowOffset = clamp(arrowOffset, innerLeft, innerRight);
 
     const innerTop = px(arrowSize);
-    const innerBottom = pxe(height - arrowSize);
+    const innerBottom = pxe(height);
 
     const startPoint = p(innerLeft, innerTop + borderRadius);
     const arrowPoint = p(arrowOffset, 1);
@@ -511,13 +511,17 @@ const getTemplatePath = (width, height, arrowOffset, arrowSize, borderRadius) =>
 
 const getPathData = function(position, width, height, arrowOffset, arrowSize, borderRadius) {
 
+    const pa = arrowSize + borderRadius;
+    const pb = borderRadius;
+
     const handlers = {
 
         bottom: () => {
             const d = getTemplatePath(width, height, arrowOffset, arrowSize, borderRadius);
             return {
                 d,
-                transform: ''
+                transform: '',
+                padding: [pa, pb, pb, pb].map((it) => `${it}px`).join(' ')
             };
         },
 
@@ -525,7 +529,8 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
             const d = getTemplatePath(width, height, width - arrowOffset, arrowSize, borderRadius);
             return {
                 d,
-                transform: `rotate(180,${width * 0.5},${height * 0.5})`
+                transform: `rotate(180,${width * 0.5},${height * 0.5})`,
+                padding: [pb, pb, pa, pb].map((it) => `${it}px`).join(' ')
             };
         },
 
@@ -535,7 +540,8 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
             const y = (height - width) * 0.5;
             return {
                 d,
-                transform: `translate(${x} ${y}) rotate(90,${height * 0.5},${width * 0.5})`
+                transform: `translate(${x} ${y}) rotate(90,${height * 0.5},${width * 0.5})`,
+                padding: [pb, pa, pb, pb].map((it) => `${it}px`).join(' ')
             };
         },
 
@@ -545,7 +551,8 @@ const getPathData = function(position, width, height, arrowOffset, arrowSize, bo
             const y = (height - width) * 0.5;
             return {
                 d,
-                transform: `translate(${x} ${y}) rotate(-90,${height * 0.5},${width * 0.5})`
+                transform: `translate(${x} ${y}) rotate(-90,${height * 0.5},${width * 0.5})`,
+                padding: [pb, pb, pb, pa].map((it) => `${it}px`).join(' ')
             };
         }
     };
@@ -629,7 +636,7 @@ export const getPositionStyle = (info, options = {}) => {
 
     const background = `${backgroundImage} center no-repeat`;
 
-    const padding = `${o.arrowSize + o.borderRadius}px`;
+    const padding = data.padding;
 
     const style = {
         background,
