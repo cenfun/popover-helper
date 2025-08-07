@@ -178,36 +178,48 @@ const calculateSpace = (info, containerRect, targetRect) => {
 
 // ===========================================================================================
 
-const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeType) => {
 
-    const popoverStart = info[alignType];
-    const popoverSize = info[sizeType];
+// eslint-disable-next-line complexity
+const calculateAlignOffset = (info, containerRect, targetRect, LT, WH) => {
 
-    const containerStart = containerRect[alignType];
-    const containerSize = containerRect[sizeType];
+    const popoverLT = info[LT];
+    const popoverWH = info[WH];
 
-    const targetStart = targetRect[alignType];
-    const targetSize = targetRect[sizeType];
+    const containerLT = containerRect[LT];
+    const containerWH = containerRect[WH];
 
-    const targetCenter = targetStart + targetSize * 0.5;
+    const targetLT = targetRect[LT];
+    const targetWH = targetRect[WH];
+
+    const targetCenter = targetLT + targetWH * 0.5;
 
     // size overflow
-    if (popoverSize > containerSize) {
-        const overflow = (popoverSize - containerSize) * 0.5;
-        info[alignType] = containerStart - overflow;
-        info.offset = targetCenter - containerStart + overflow;
+    if (popoverWH > containerWH) {
+        const overflow = (popoverWH - containerWH) * 0.5;
+        info[LT] = containerLT - overflow;
+        info.offset = targetCenter - containerLT + overflow;
         return;
     }
 
-    const space1 = popoverStart - containerStart;
-    const space2 = (containerStart + containerSize) - (popoverStart + popoverSize);
+    const space1 = popoverLT - containerLT;
+    const space2 = (containerLT + containerWH) - (popoverLT + popoverWH);
 
     // both side passed, default to center
     if (space1 >= 0 && space2 >= 0) {
         if (info.passed) {
             info.passed += 2;
         }
-        info.offset = popoverSize * 0.5;
+
+        if (info.align === 'start') {
+            info.offset = targetWH * 0.5;
+            return;
+        }
+        if (info.align === 'end') {
+            info.offset = popoverWH - targetWH * 0.5;
+            return;
+        }
+        info.offset = popoverWH * 0.5;
+
         return;
     }
 
@@ -217,15 +229,15 @@ const calculateAlignOffset = (info, containerRect, targetRect, alignType, sizeTy
     }
 
     if (space1 < 0) {
-        const min = containerStart;
-        info[alignType] = min;
+        const min = containerLT;
+        info[LT] = min;
         info.offset = targetCenter - min;
         return;
     }
 
     // space2 < 0
-    const max = containerStart + containerSize - popoverSize;
-    info[alignType] = max;
+    const max = containerLT + containerWH - popoverWH;
+    info[LT] = max;
     info.offset = targetCenter - max;
 
 };
@@ -241,11 +253,11 @@ const calculateHV = (info, containerRect) => {
 
 const calculateOffset = (info, containerRect, targetRect) => {
 
-    const [alignType, sizeType] = calculateHV(info, containerRect);
+    const [LT, WH] = calculateHV(info, containerRect);
 
-    calculateAlignOffset(info, containerRect, targetRect, alignType, sizeType);
+    calculateAlignOffset(info, containerRect, targetRect, LT, WH);
 
-    info.offset = clamp(info.offset, 0, info[sizeType]);
+    info.offset = clamp(info.offset, 0, info[WH]);
 
 };
 
