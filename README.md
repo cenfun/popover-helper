@@ -40,11 +40,13 @@ const update = () => {
     const style = getPositionStyle(positionInfo, {
         bgColor: "#fff",
         borderColor: "#ccc",
-        arrowSize: 10
+        arrowSize: 10,
+        borderRadius: 5
     });
     // performance optimized
     if (style.changed) {
         $popover.style.background = style.background;
+        $popover.style.padding = style.padding;
     }
 };
 
@@ -54,6 +56,10 @@ update();
 see [/public/index.html](/public/index.html)
 
 ## CHANGELOG
+
+- 3.0.0
+    - new feature: align to target
+    - new feature: better padding calculation
 
 - 2.0.5
     - added argument `fixed` for `getRect(target, fixed)`

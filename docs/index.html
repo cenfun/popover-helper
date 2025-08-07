@@ -21,6 +21,8 @@
         <input type="text" value="#000" class="popover-color" />
         arrow size:
         <input type="number" step="1" min="0" value="10" class="popover-arrow-size" />
+        border radius:
+        <input type="number" step="1" min="0" value="5" class="popover-border-radius" />
     </div>
 
     <div>
@@ -93,6 +95,8 @@
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
 
+    defaultPositions.push("align")
+
     defaultPositions.forEach((item) => {
         const label = document.createElement('label');
         const input = document.createElement('input');
@@ -148,6 +152,7 @@
         const bgColor = $popover.style.getPropertyValue('--popover-bg-color');
         const borderColor = $popover.style.getPropertyValue('--popover-border-color');
         const arrowSize = $popover.style.getPropertyValue('--popover-arrow-size');
+        const borderRadius = $popover.style.getPropertyValue('--popover-border-radius');  
 
         // let start_time = performance.now();
 
@@ -185,7 +190,8 @@
         const style = getPositionStyle(positionInfo, {
             bgColor,
             borderColor,
-            arrowSize: parseInt(arrowSize)
+            arrowSize: parseInt(arrowSize),
+            borderRadius:parseInt(borderRadius)
         });
 
         // log('getPositionStyle', performance.now() - start_time);
@@ -195,6 +201,7 @@
         // performance optimized
         if (style.changed) {
             $popover.style.background = style.background;
+            $popover.style.padding = style.padding;
             // log('background', performance.now() - start_time);
         }
     };
@@ -314,6 +321,7 @@
         'popover-bg-color',
         'popover-color',
         'popover-arrow-size',
+        'popover-border-radius',
         'popover-width',
         'popover-height',
         'container-width',
