@@ -116,21 +116,25 @@ export const getRect = (target, fixed) => {
 
 // ===========================================================================================
 
-const calculateLeft = (info, targetRect) => {
+const calculateLeft = (info, containerRect, targetRect) => {
     if (info.align === 'start') {
         info.left = Math.round(targetRect.left);
+        info.spaceAlign = containerRect.left + containerRect.width - info.left - info.width;
     } else if (info.align === 'end') {
         info.left = Math.round(targetRect.left + targetRect.width - info.width);
+        info.spaceAlign = info.left - containerRect.left;
     } else {
         info.left = Math.round(targetRect.left + targetRect.width * 0.5 - info.width * 0.5);
     }
 };
 
-const calculateTop = (info, targetRect) => {
+const calculateTop = (info, containerRect, targetRect) => {
     if (info.align === 'start') {
         info.top = Math.round(targetRect.top);
+        info.spaceAlign = containerRect.top + containerRect.height - info.top - info.height;
     } else if (info.align === 'end') {
         info.top = Math.round(targetRect.top + targetRect.height - info.height);
+        info.spaceAlign = info.top - containerRect.top;
     } else {
         info.top = Math.round(targetRect.top + targetRect.height * 0.5 - info.height * 0.5);
     }
@@ -141,25 +145,25 @@ const calculators = {
     bottom: (info, containerRect, targetRect) => {
         info.space = containerRect.top + containerRect.height - targetRect.top - targetRect.height - info.height;
         info.top = targetRect.top + targetRect.height;
-        calculateLeft(info, targetRect);
+        calculateLeft(info, containerRect, targetRect);
     },
 
     top: (info, containerRect, targetRect) => {
         info.space = targetRect.top - info.height - containerRect.top;
         info.top = targetRect.top - info.height;
-        calculateLeft(info, targetRect);
+        calculateLeft(info, containerRect, targetRect);
     },
 
     right: (info, containerRect, targetRect) => {
         info.space = containerRect.left + containerRect.width - targetRect.left - targetRect.width - info.width;
         info.left = targetRect.left + targetRect.width;
-        calculateTop(info, targetRect);
+        calculateTop(info, containerRect, targetRect);
     },
 
     left: (info, containerRect, targetRect) => {
         info.space = targetRect.left - info.width - containerRect.left;
         info.left = targetRect.left - info.width;
-        calculateTop(info, targetRect);
+        calculateTop(info, containerRect, targetRect);
     }
 };
 
@@ -290,7 +294,7 @@ const calculatePositionInfo = (info, containerRect, targetRect, previousPosition
 
 // ===========================================================================================
 
-const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, previousPositionInfo) => {
+const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, withAlign, previousPositionInfo) => {
 
     // position space: +1
     // align space:
@@ -318,12 +322,16 @@ const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, 
         positionList.push(info);
     });
 
+    // eslint-disable-next-line complexity
     positionList.sort((a, b) => {
         if (a.passed !== b.passed) {
             return b.passed - a.passed;
         }
 
-        if (withOrder && a.passed >= safePassed && b.passed >= safePassed) {
+        if (withOrder && a.passed >= safePassed) {
+            if (withAlign && a.position === b.position) {
+                return b.spaceAlign - a.spaceAlign;
+            }
             return a.index - b.index;
         }
 
@@ -331,23 +339,26 @@ const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, 
             return b.space - a.space;
         }
 
+        if (withAlign && a.position === b.position) {
+            return b.spaceAlign - a.spaceAlign;
+        }
         return a.index - b.index;
     });
 
-    // logTable(positionList);
+    logTable(positionList);
 
     return positionList[0];
 };
 
-// const logTable = (() => {
-//     let time_id;
-//     return (info) => {
-//         clearTimeout(time_id);
-//         time_id = setTimeout(() => {
-//             console.table(info);
-//         }, 10);
-//     };
-// })();
+const logTable = (() => {
+    let time_id;
+    return (info) => {
+        clearTimeout(time_id);
+        time_id = setTimeout(() => {
+            console.table(info);
+        }, 10);
+    };
+})();
 
 // ===========================================================================================
 
@@ -423,6 +434,7 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
             height: popoverRect.height,
 
             space: 0,
+            spaceAlign: 0,
 
             offset: 0,
             passed: 0,
@@ -451,7 +463,9 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
 
     // log('allowList', performance.now() - start_time);
 
-    const bestPosition = calculateBestPosition(containerRect, targetRect, allowList, withOrder, previousPositionInfo);
+    const withAlign = alignStart && alignEnd;
+
+    const bestPosition = calculateBestPosition(containerRect, targetRect, allowList, withOrder, withAlign, previousPositionInfo);
 
     // check left/top
     bestPosition.changed = isPositionChanged(bestPosition, previousPositionInfo);
