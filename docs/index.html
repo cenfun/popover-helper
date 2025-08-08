@@ -7,7 +7,7 @@
     <title>popover-helper</title>
     <link href="./style.css" rel="stylesheet" />
     <!--inject:start-->
-    <script src="dist/popover-helper.js?v=2.0.5"></script>
+    <script src="dist/popover-helper.js?v=3.0.0"></script>
     <!--inject:end-->
 </head>
 <body>
@@ -95,7 +95,9 @@
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
 
-    defaultPositions.push("align")
+    defaultPositions.push("align");
+    defaultPositions.push("start");
+    defaultPositions.push("end");
 
     defaultPositions.forEach((item) => {
         const label = document.createElement('label');
@@ -377,6 +379,6 @@
     };
     
    </script>
-   <script src="https://cdn.jsdelivr.net/npm/fps-detector@latest/dist/fps-detector.js"></script>
+   <script async src="https://cdn.jsdelivr.net/npm/fps-detector@latest/dist/fps-detector.js"></script>
 </body>
 </html>
