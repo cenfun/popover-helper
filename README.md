@@ -57,6 +57,9 @@ see [/public/index.html](/public/index.html)
 
 ## CHANGELOG
 
+- 3.0.1
+    - added: align to start/end
+
 - 3.0.0
     - new feature: align to target
     - new feature: better padding calculation

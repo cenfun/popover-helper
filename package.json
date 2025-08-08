@@ -28,7 +28,7 @@
     "devDependencies": {
         "eslint": "^9.32.0",
         "eslint-config-plus": "^2.0.2",
-        "stylelint": "^16.23.0",
+        "stylelint": "^16.23.1",
         "stylelint-config-plus": "^1.1.4"
     }
 }

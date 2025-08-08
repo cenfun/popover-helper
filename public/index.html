@@ -95,7 +95,9 @@
     const $positions = document.querySelector('.positions');
     const defaultPositions = getDefaultPositions();
 
-    defaultPositions.push("align")
+    defaultPositions.push("align");
+    defaultPositions.push("start");
+    defaultPositions.push("end");
 
     defaultPositions.forEach((item) => {
         const label = document.createElement('label');

@@ -378,7 +378,8 @@ const isPositionChanged = (info, previousPositionInfo) => {
 export const getBestPosition = (containerRect, targetRect, popoverRect, positions, previousPositionInfo) => {
 
     const defaultAllowPositions = getDefaultPositions();
-    let withAlign = false;
+    let alignStart = false;
+    let alignEnd = false;
     let withOrder = false;
     let allowPositions = defaultAllowPositions;
     if (positions) {
@@ -387,8 +388,16 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
         }
         positions = positions.split(',').map((it) => it.trim().toLowerCase()).filter((it) => it);
         if (positions.includes('align')) {
-            withAlign = true;
+            alignStart = true;
+            alignEnd = true;
         }
+        if (positions.includes('start')) {
+            alignStart = true;
+        }
+        if (positions.includes('end')) {
+            alignEnd = true;
+        }
+
         positions = positions.filter((it) => defaultAllowPositions.includes(it));
         if (positions.length) {
             withOrder = true;
@@ -420,18 +429,24 @@ export const getBestPosition = (containerRect, targetRect, popoverRect, position
 
             distance: 0
         };
-        if (withAlign) {
-            allowList.push({
-                ... item,
-                align: 'start'
-            });
-            allowList.push({
-                ... item,
-                align: 'end'
-            });
+
+        if (alignStart || alignEnd) {
+            if (alignStart) {
+                allowList.push({
+                    ... item,
+                    align: 'start'
+                });
+            }
+            if (alignEnd) {
+                allowList.push({
+                    ... item,
+                    align: 'end'
+                });
+            }
         } else {
             allowList.push(item);
         }
+
     });
 
     // log('allowList', performance.now() - start_time);
