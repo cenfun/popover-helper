@@ -345,20 +345,20 @@ const calculateBestPosition = (containerRect, targetRect, allowList, withOrder, 
         return a.index - b.index;
     });
 
-    logTable(positionList);
+    // logTable(positionList);
 
     return positionList[0];
 };
 
-const logTable = (() => {
-    let time_id;
-    return (info) => {
-        clearTimeout(time_id);
-        time_id = setTimeout(() => {
-            console.table(info);
-        }, 10);
-    };
-})();
+// const logTable = (() => {
+//     let time_id;
+//     return (info) => {
+//         clearTimeout(time_id);
+//         time_id = setTimeout(() => {
+//             console.table(info);
+//         }, 10);
+//     };
+// })();
 
 // ===========================================================================================
 
